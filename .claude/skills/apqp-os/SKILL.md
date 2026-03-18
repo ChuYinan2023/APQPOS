@@ -171,16 +171,16 @@ report.print_summary(artifact)
 | n06 | Quantity Calc | references/n06-requirements.md | auto |
 | n07 | DFMEA | references/n07-requirements.md | mixed |
 | n08 | Process Route | references/n08-requirements.md | mixed |
-| n09 | DVPR | — | mixed |
-| n10 | PFD | — | mixed |
-| n11 | Material Cost | — | auto |
-| n12 | Conversion Cost | — | auto |
-| n13 | Capacity | — | mixed |
-| n14 | Project Plan | — | mixed |
-| n15 | EDD | — | mixed |
-| n16 | RC | — | auto |
-| n17 | NRC | — | auto |
-| n18 | Quotation | — | **human** |
+| n09 | DVPR | references/n09-requirements.md | mixed |
+| n10 | PFD | references/n10-requirements.md | mixed |
+| n11 | Material Cost | references/n11-requirements.md | auto |
+| n12 | Conversion Cost | references/n12-requirements.md | auto |
+| n13 | Capacity | references/n13-requirements.md | mixed |
+| n14 | Project Plan | references/n14-requirements.md | mixed |
+| n15 | EDD | references/n15-requirements.md | mixed |
+| n16 | RC | references/n16-requirements.md | auto |
+| n17 | NRC | references/n17-requirements.md | auto |
+| n18 | Quotation | references/n18-requirements.md | **human** |
 
 Load the guide before executing any node. Guides follow the template in `references/guide-template.md`.
 
