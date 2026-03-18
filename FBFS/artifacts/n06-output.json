@@ -1,0 +1,206 @@
+{
+  "node": "n06",
+  "project": "FBFS",
+  "status": "ready",
+  "produced_at": "2026-03-18T05:43:50.809125+00:00",
+  "confidence_floor": "S4",
+  "gaps": [
+    {
+      "rule": "R-06-01",
+      "msg": "annual_volume=50000 is assumption (inherited from n01 R-01-01)",
+      "severity": "warning",
+      "assumption": "annual_volume=50000 (S4)"
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "A-COMP-03-weight",
+      "field": "COMP-03.net_weight_g",
+      "value": "35.0",
+      "unit": "g",
+      "confidence": "S4",
+      "rationale": "QC 5/16\" 90deg PA66-GF connector, catalog similar ~35g"
+    },
+    {
+      "id": "A-COMP-04-weight",
+      "field": "COMP-04.net_weight_g",
+      "value": "55.0",
+      "unit": "g",
+      "confidence": "S4",
+      "rationale": "QC 3/8\" 90deg metallic connector with secondary latch, catalog similar ~55g"
+    },
+    {
+      "id": "A-COMP-05-weight",
+      "field": "COMP-05.net_weight_g",
+      "value": "120.0",
+      "unit": "g",
+      "confidence": "S4",
+      "rationale": "Fuel damper (Nobel Auto), similar inline damper ~120g"
+    },
+    {
+      "id": "A-COMP-06-weight",
+      "field": "COMP-06.net_weight_g",
+      "value": "15.0",
+      "unit": "g",
+      "confidence": "S4",
+      "rationale": "Braided anti-abrasion sleeve ~250mm, PET braid ~15g"
+    },
+    {
+      "id": "A-COMP-07-weight",
+      "field": "COMP-07.net_weight_g",
+      "value": "3.0",
+      "unit": "g",
+      "confidence": "S4",
+      "rationale": "Protection cap, PE/PP small cap ~3g each"
+    },
+    {
+      "id": "A-COMP-08-weight",
+      "field": "COMP-08.net_weight_g",
+      "value": "5.0",
+      "unit": "g",
+      "confidence": "S4",
+      "rationale": "Nylon tube clip, standard automotive clip ~5g each"
+    },
+    {
+      "id": "A-COMP-09-weight",
+      "field": "COMP-09.net_weight_g",
+      "value": "1.5",
+      "unit": "g",
+      "confidence": "S4",
+      "rationale": "O-ring seal (FKM+FVMQ dual), small seal ~1.5g each"
+    },
+    {
+      "id": "A-annual-volume",
+      "field": "annual_volume",
+      "value": "50000",
+      "unit": "件/年",
+      "confidence": "S4",
+      "rationale": "Inherited from n01 — customer RFQ did not specify annual volume"
+    }
+  ],
+  "payload": {
+    "annual_volume": 50000,
+    "annual_volume_confidence": "S4",
+    "items": [
+      {
+        "component_ref": "COMP-01",
+        "bom_item_number": "1100",
+        "quantity": 1,
+        "net_weight_g": 13.46,
+        "scrap_rate_pct": 13.5,
+        "scrap_source": "extrusion 6.5% + cut_to_length 4.0% + bending 3.0%",
+        "gross_weight_g": 15.28,
+        "annual_net_kg": 672.9,
+        "annual_gross_kg": 763.8,
+        "calculation_method": "tube: π×(OD²-ID²)/4×L×ρ  [OD=8.0mm, ID=6.0mm, L=600mm, ρ=1.02 g/cm³]",
+        "confidence": "S2"
+      },
+      {
+        "component_ref": "COMP-02",
+        "bom_item_number": "1200",
+        "quantity": 1,
+        "net_weight_g": 17.3,
+        "scrap_rate_pct": 13.5,
+        "scrap_source": "extrusion 6.5% + cut_to_length 4.0% + bending 3.0%",
+        "gross_weight_g": 19.64,
+        "annual_net_kg": 865.2,
+        "annual_gross_kg": 982.0,
+        "calculation_method": "tube: π×(OD²-ID²)/4×L×ρ  [OD=10.0mm, ID=8.0mm, L=600mm, ρ=1.02 g/cm³]",
+        "confidence": "S2"
+      },
+      {
+        "component_ref": "COMP-03",
+        "bom_item_number": "1300",
+        "quantity": 1,
+        "net_weight_g": 35.0,
+        "scrap_rate_pct": 0.0,
+        "scrap_source": "buy part — no production scrap",
+        "gross_weight_g": 35.0,
+        "annual_net_kg": 1750.0,
+        "annual_gross_kg": 1750.0,
+        "calculation_method": "buy_part estimate: QC 5/16\" 90deg PA66-GF connector, catalog similar ~35g",
+        "confidence": "S4"
+      },
+      {
+        "component_ref": "COMP-04",
+        "bom_item_number": "1400",
+        "quantity": 1,
+        "net_weight_g": 55.0,
+        "scrap_rate_pct": 0.0,
+        "scrap_source": "buy part — no production scrap",
+        "gross_weight_g": 55.0,
+        "annual_net_kg": 2750.0,
+        "annual_gross_kg": 2750.0,
+        "calculation_method": "buy_part estimate: QC 3/8\" 90deg metallic connector with secondary latch, catalog similar ~55g",
+        "confidence": "S4"
+      },
+      {
+        "component_ref": "COMP-05",
+        "bom_item_number": "1500",
+        "quantity": 1,
+        "net_weight_g": 120.0,
+        "scrap_rate_pct": 5.0,
+        "scrap_source": "fallback 5%",
+        "gross_weight_g": 126.0,
+        "annual_net_kg": 6000.0,
+        "annual_gross_kg": 6300.0,
+        "calculation_method": "buy_part estimate: Fuel damper (Nobel Auto), similar inline damper ~120g",
+        "confidence": "S4"
+      },
+      {
+        "component_ref": "COMP-06",
+        "bom_item_number": "1600",
+        "quantity": 1,
+        "net_weight_g": 15.0,
+        "scrap_rate_pct": 0.0,
+        "scrap_source": "buy part — no production scrap",
+        "gross_weight_g": 15.0,
+        "annual_net_kg": 750.0,
+        "annual_gross_kg": 750.0,
+        "calculation_method": "buy_part estimate: Braided anti-abrasion sleeve ~250mm, PET braid ~15g",
+        "confidence": "S4"
+      },
+      {
+        "component_ref": "COMP-07",
+        "bom_item_number": "1700",
+        "quantity": 2,
+        "net_weight_g": 3.0,
+        "scrap_rate_pct": 0.0,
+        "scrap_source": "buy part — no production scrap",
+        "gross_weight_g": 3.0,
+        "annual_net_kg": 300.0,
+        "annual_gross_kg": 300.0,
+        "calculation_method": "buy_part estimate: Protection cap, PE/PP small cap ~3g each",
+        "confidence": "S4"
+      },
+      {
+        "component_ref": "COMP-08",
+        "bom_item_number": "1800",
+        "quantity": 3,
+        "net_weight_g": 5.0,
+        "scrap_rate_pct": 0.0,
+        "scrap_source": "buy part — no production scrap",
+        "gross_weight_g": 5.0,
+        "annual_net_kg": 750.0,
+        "annual_gross_kg": 750.0,
+        "calculation_method": "buy_part estimate: Nylon tube clip, standard automotive clip ~5g each",
+        "confidence": "S4"
+      },
+      {
+        "component_ref": "COMP-09",
+        "bom_item_number": "1900",
+        "quantity": 4,
+        "net_weight_g": 1.5,
+        "scrap_rate_pct": 0.0,
+        "scrap_source": "buy part — no production scrap",
+        "gross_weight_g": 1.5,
+        "annual_net_kg": 300.0,
+        "annual_gross_kg": 300.0,
+        "calculation_method": "buy_part estimate: O-ring seal (FKM+FVMQ dual), small seal ~1.5g each",
+        "confidence": "S4"
+      }
+    ],
+    "total_assembly_net_weight_g": 282.76,
+    "total_assembly_gross_weight_g": 292.92
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "node": "n16",
+  "project": "FBFS",
+  "status": "ready",
+  "produced_at": "2026-03-18T10:21:24.980453+00:00",
+  "confidence_floor": "S4",
+  "gaps": [
+    {
+      "rule": "R-16-01",
+      "msg": "Logistics (5%), quality (3%), overhead (10%), profit (8%) are S4 assumptions — confirm with controlling",
+      "severity": "warning",
+      "assumption": "All percentage-based adders are industry estimates"
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "A-16-logistics",
+      "field": "logistics_eur",
+      "value": "1.7571",
+      "unit": "EUR/pc",
+      "confidence": "S4",
+      "rationale": "Logistics estimated as 5% of (material + conversion); confirm with logistics department"
+    },
+    {
+      "id": "A-16-quality",
+      "field": "quality_cost_eur",
+      "value": "1.0543",
+      "unit": "EUR/pc",
+      "confidence": "S4",
+      "rationale": "Quality cost estimated as 3% of (material + conversion); confirm with quality department"
+    },
+    {
+      "id": "A-16-overhead",
+      "field": "overhead_eur",
+      "value": "0.8178",
+      "unit": "EUR/pc",
+      "confidence": "S4",
+      "rationale": "Overhead estimated as 10% of conversion cost; confirm with controlling"
+    },
+    {
+      "id": "A-16-profit",
+      "field": "profit_margin_pct",
+      "value": "8.0",
+      "unit": "%",
+      "confidence": "S4",
+      "rationale": "Profit margin 8% is company target; adjust per project strategy"
+    }
+  ],
+  "payload": {
+    "material_cost_eur": 26.9643,
+    "conversion_cost_eur": 8.1785,
+    "logistics_eur": 1.7571,
+    "quality_cost_eur": 1.0543,
+    "overhead_eur": 0.8178,
+    "profit_margin_pct": 8.0,
+    "profit_eur": 3.1018,
+    "total_rc_eur": 41.8738,
+    "cost_breakdown_pct": {
+      "material": 64.4,
+      "conversion": 19.5,
+      "logistics": 4.2,
+      "quality": 2.5,
+      "overhead": 2.0,
+      "profit": 7.4
+    }
+  }
+}

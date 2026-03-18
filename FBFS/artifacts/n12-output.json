@@ -1,0 +1,177 @@
+{
+  "node": "n12",
+  "project": "FBFS",
+  "status": "ready",
+  "produced_at": "2026-03-18T10:19:24.555248+00:00",
+  "confidence_floor": "S4",
+  "gaps": [
+    {
+      "rule": "R-12-01",
+      "msg": "Labor rate 30.0 EUR/hr is assumption — no project-specific data",
+      "severity": "warning",
+      "assumption": "30.0 EUR/hr (S3)"
+    },
+    {
+      "rule": "R-12-02",
+      "msg": "Equipment investment values from n08 are estimates (3 operations)",
+      "severity": "info",
+      "assumption": "Investment values inherited from n08 assumptions"
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "A-12-01",
+      "field": "labor_rate_eur_hr",
+      "value": "30.0",
+      "unit": "EUR/hr",
+      "confidence": "S3",
+      "rationale": "Central Europe automotive tier-1 average labor rate including social charges"
+    },
+    {
+      "id": "A-12-02",
+      "field": "overhead_rate_pct",
+      "value": "175",
+      "unit": "%",
+      "confidence": "S4",
+      "rationale": "Industry standard 150-200% of direct labor, mid-range selected"
+    },
+    {
+      "id": "A-12-03",
+      "field": "depreciation_years",
+      "value": "7",
+      "unit": "years",
+      "confidence": "S3",
+      "rationale": "Standard equipment depreciation period for automotive production equipment"
+    },
+    {
+      "id": "A-12-04",
+      "field": "annual_operating_hours",
+      "value": "5000",
+      "unit": "hr/yr",
+      "confidence": "S3",
+      "rationale": "3-shift operation assumption (5000 hrs/yr effective)"
+    }
+  ],
+  "payload": {
+    "operations": [
+      {
+        "op_ref": "OP10",
+        "op_name": "Tube Extrusion (PA12)",
+        "cycle_time_sec": 45,
+        "operators": 1,
+        "investment_eur": 280000,
+        "labor_cost_eur": 0.375,
+        "equipment_cost_eur": 0.1333,
+        "overhead_eur": 0.6562,
+        "total_eur": 1.1646
+      },
+      {
+        "op_ref": "OP20",
+        "op_name": "Cut to Length",
+        "cycle_time_sec": 8,
+        "operators": 0,
+        "investment_eur": 35000,
+        "labor_cost_eur": 0.0,
+        "equipment_cost_eur": 0.0167,
+        "overhead_eur": 0.0,
+        "total_eur": 0.0167
+      },
+      {
+        "op_ref": "OP30",
+        "op_name": "CNC Tube Bending",
+        "cycle_time_sec": 35,
+        "operators": 1,
+        "investment_eur": 180000,
+        "labor_cost_eur": 0.2917,
+        "equipment_cost_eur": 0.0857,
+        "overhead_eur": 0.5104,
+        "total_eur": 0.8878
+      },
+      {
+        "op_ref": "OP40",
+        "op_name": "End Forming (bead/flare for QC attachment)",
+        "cycle_time_sec": 25,
+        "operators": 1,
+        "investment_eur": 95000,
+        "labor_cost_eur": 0.2083,
+        "equipment_cost_eur": 0.0452,
+        "overhead_eur": 0.3646,
+        "total_eur": 0.6182
+      },
+      {
+        "op_ref": "OP50",
+        "op_name": "QC Connector Assembly (press-fit + verification)",
+        "cycle_time_sec": 40,
+        "operators": 1,
+        "investment_eur": 120000,
+        "labor_cost_eur": 0.3333,
+        "equipment_cost_eur": 0.0571,
+        "overhead_eur": 0.5833,
+        "total_eur": 0.9738
+      },
+      {
+        "op_ref": "OP60",
+        "op_name": "Damper Sub-Assembly (press-fit/crimp to tubes)",
+        "cycle_time_sec": 30,
+        "operators": 1,
+        "investment_eur": 85000,
+        "labor_cost_eur": 0.25,
+        "equipment_cost_eur": 0.0405,
+        "overhead_eur": 0.4375,
+        "total_eur": 0.728
+      },
+      {
+        "op_ref": "OP70",
+        "op_name": "Final Assembly (anti-abrasion sleeve + clips)",
+        "cycle_time_sec": 35,
+        "operators": 1,
+        "investment_eur": 25000,
+        "labor_cost_eur": 0.2917,
+        "equipment_cost_eur": 0.0119,
+        "overhead_eur": 0.5104,
+        "total_eur": 0.814
+      },
+      {
+        "op_ref": "OP80",
+        "op_name": "100% Leak Test (pressure decay)",
+        "cycle_time_sec": 45,
+        "operators": 1,
+        "investment_eur": 150000,
+        "labor_cost_eur": 0.375,
+        "equipment_cost_eur": 0.0714,
+        "overhead_eur": 0.6562,
+        "total_eur": 1.1027
+      },
+      {
+        "op_ref": "OP90",
+        "op_name": "Cleanliness Check (gravimetric)",
+        "cycle_time_sec": 60,
+        "operators": 1,
+        "investment_eur": 75000,
+        "labor_cost_eur": 0.5,
+        "equipment_cost_eur": 0.0357,
+        "overhead_eur": 0.875,
+        "total_eur": 1.4107
+      },
+      {
+        "op_ref": "OP100",
+        "op_name": "Protection Caps Installation + Packaging",
+        "cycle_time_sec": 20,
+        "operators": 1,
+        "investment_eur": 8000,
+        "labor_cost_eur": 0.1667,
+        "equipment_cost_eur": 0.0038,
+        "overhead_eur": 0.2917,
+        "total_eur": 0.4621
+      }
+    ],
+    "summary": {
+      "total_conversion_cost_eur": 8.1785,
+      "labor_rate_assumption": 30.0,
+      "overhead_rate_assumption": 175.0,
+      "depreciation_years": 7,
+      "annual_operating_hours": 5000,
+      "operation_count": 10
+    }
+  }
+}

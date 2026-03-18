@@ -1,0 +1,1173 @@
+{
+  "node": "n01",
+  "project": "FBFS",
+  "status": "ready",
+  "confidence_floor": "S4",
+  "gaps": [
+    {
+      "rule": "R-01-01",
+      "msg": "annual_volume 未在任何文档中说明",
+      "severity": "warning",
+      "assumption": "50,000/年 (S4)"
+    },
+    {
+      "rule": "R-01-02",
+      "msg": "sop_date 未在任何文档中说明",
+      "severity": "warning",
+      "assumption": ""
+    },
+    {
+      "rule": "R-01-04",
+      "msg": "3D model 不可用 (OLE链接指向外部文件无法恢复)",
+      "severity": "info",
+      "assumption": ""
+    },
+    {
+      "rule": "R-01-07",
+      "msg": "tko_date / rfq_response_date 未在文档中找到",
+      "severity": "warning",
+      "assumption": ""
+    },
+    {
+      "rule": "R-01-03",
+      "msg": "61 个引用标准未提供于 inputs/: PF.90092, CD.80064, CS.00251, CS-11000, CS.00050, CS.00265, CS.CCP-ROUTING, LP.7A004, LP.7A005, MS.90025/06...",
+      "severity": "error",
+      "assumption": ""
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "A-01",
+      "field": "annual_volume",
+      "value": "50000",
+      "unit": "件/年",
+      "confidence": "S4",
+      "rationale": "客户文件未说明年产量，使用行业基准"
+    },
+    {
+      "id": "A-02",
+      "field": "PF.90068适用性",
+      "value": "保留参考",
+      "unit": "",
+      "confidence": "S5",
+      "rationale": "DEF加热管线规范包含在RFQ中但可能不适用于燃油供给管路"
+    }
+  ],
+  "payload": {
+    "oem": "Stellantis",
+    "product_category": "fuel-supply-line",
+    "part_number": "FC00SAA78530",
+    "part_name": "Fuel supply line — diesel filter to engine",
+    "program": "STELLANTIS KP1 A&B",
+    "engine": "2.2 diesel",
+    "platform": "KP1",
+    "annual_volume": null,
+    "sop_date": null,
+    "tko_date": null,
+    "rfq_response_date": null,
+    "working_pressure_bar": 4.5,
+    "design_life": "15 years / 300,000 km",
+    "geometry": {
+      "feed_line_od_mm": 8,
+      "feed_line_id_mm": 6,
+      "return_line_od_mm": 10,
+      "return_line_id_mm": 8,
+      "qc_spigot_od_mm": 12.94,
+      "qc_spigot_id_mm": 9.49,
+      "qc_spigot_length_mm": 15.38,
+      "clip_assembly_force_max_N": 35,
+      "clip_removal_force_min_N": 100,
+      "tube_insertion_force_max_N": 40,
+      "tube_removal_force_min_N": 80,
+      "pipe_material": "Monolayer or multilayer (recommended)",
+      "confidence": "S1",
+      "source_doc": "CTS PPTX + image8"
+    },
+    "performance_requirements": [
+      {
+        "id": "PR-001",
+        "parameter": "Burst pressure @RT",
+        "value": ">=8x working pressure",
+        "unit": "bar",
+        "condition": "@22°C",
+        "confidence": "S1",
+        "source_doc": "PF.90197",
+        "source_section": "§7.4"
+      },
+      {
+        "id": "PR-002",
+        "parameter": "Burst pressure @115°C",
+        "value": ">=3x working pressure",
+        "unit": "bar",
+        "condition": "@115°C",
+        "confidence": "S1",
+        "source_doc": "PF.90197",
+        "source_section": "§7.4"
+      },
+      {
+        "id": "PR-003",
+        "parameter": "Leak resistance (fuel)",
+        "value": "no leak at 150 PSI",
+        "unit": "PSI",
+        "condition": "VLD 15um x 3mm",
+        "confidence": "S1",
+        "source_doc": "PF.90197",
+        "source_section": "§7.2"
+      },
+      {
+        "id": "PR-004",
+        "parameter": "Working pressure",
+        "value": "4.5",
+        "unit": "bar",
+        "condition": "max continuous",
+        "confidence": "S1",
+        "source_doc": "CTS PPTX"
+      },
+      {
+        "id": "PR-005",
+        "parameter": "Temperature range",
+        "value": "-40 to +90 (continuous), +115 short-term",
+        "unit": "°C",
+        "condition": "nylon lines",
+        "confidence": "S1",
+        "source_doc": "PF.90197",
+        "source_section": "§5.2"
+      },
+      {
+        "id": "PR-006",
+        "parameter": "Design life",
+        "value": "15 years / 150,000 miles",
+        "unit": "",
+        "condition": "",
+        "confidence": "S1",
+        "source_doc": "PF.90197",
+        "source_section": "§5.1"
+      },
+      {
+        "id": "PR-007",
+        "parameter": "Fitting pull-off @RT (fuel)",
+        "value": ">=450",
+        "unit": "N",
+        "condition": "@22°C",
+        "confidence": "S1",
+        "source_doc": "PF.90197",
+        "source_section": "§6.3.5"
+      },
+      {
+        "id": "PR-008",
+        "parameter": "Fitting pull-off @115°C (fuel)",
+        "value": ">=115",
+        "unit": "N",
+        "condition": "@115°C",
+        "confidence": "S1",
+        "source_doc": "PF.90197",
+        "source_section": "§6.3.5"
+      },
+      {
+        "id": "PR-009",
+        "parameter": "Internal cleanliness",
+        "value": "<=1.5",
+        "unit": "mg/dm2",
+        "condition": "gasoline/vapor",
+        "confidence": "S1",
+        "source_doc": "PF.90197",
+        "source_section": "§7.1"
+      },
+      {
+        "id": "PR-010",
+        "parameter": "Pressure drop",
+        "value": "capability based",
+        "unit": "kPa",
+        "condition": "mean+3σ, 400kPa test",
+        "confidence": "S1",
+        "source_doc": "PF.90197",
+        "source_section": "§7.3"
+      },
+      {
+        "id": "PR-011",
+        "parameter": "Static charge dissipation",
+        "value": "per SAE J1645",
+        "unit": "",
+        "condition": "",
+        "confidence": "S1",
+        "source_doc": "PF.90197",
+        "source_section": "§6.2.5"
+      },
+      {
+        "id": "PR-012",
+        "parameter": "NVH rating",
+        "value": ">=8",
+        "unit": "subjective 1-10",
+        "condition": "",
+        "confidence": "S1",
+        "source_doc": "PF.90197",
+        "source_section": "§6.3.2"
+      },
+      {
+        "id": "PR-013",
+        "parameter": "QC assembly force (<11mm)",
+        "value": "<=67",
+        "unit": "N",
+        "condition": "new fittings",
+        "confidence": "S1",
+        "source_doc": "PF.90298",
+        "source_section": "§7.2"
+      },
+      {
+        "id": "PR-014",
+        "parameter": "QC pull-apart (fuel, unexposed)",
+        "value": ">=450",
+        "unit": "N",
+        "condition": "@RT",
+        "confidence": "S1",
+        "source_doc": "PF.90298",
+        "source_section": "§7.3"
+      },
+      {
+        "id": "PR-015",
+        "parameter": "QC side load 5/16\"",
+        "value": ">=225",
+        "unit": "N",
+        "condition": "straight",
+        "confidence": "S1",
+        "source_doc": "PF.90298",
+        "source_section": "§7.4"
+      },
+      {
+        "id": "PR-016",
+        "parameter": "QC elevated temp burst (fuel)",
+        "value": ">=3447 kPa (500 psig)",
+        "unit": "kPa",
+        "condition": "",
+        "confidence": "S1",
+        "source_doc": "PF.90298",
+        "source_section": "§6.3.6"
+      },
+      {
+        "id": "PR-017",
+        "parameter": "QC dynamic impact @-30°C (metallic)",
+        "value": ">=50",
+        "unit": "J",
+        "condition": "@-30°C",
+        "confidence": "S1",
+        "source_doc": "PF.90298",
+        "source_section": "§6.3.5"
+      },
+      {
+        "id": "PR-018",
+        "parameter": "QC ESD resistance",
+        "value": "<=1MΩ @500V",
+        "unit": "Ω",
+        "condition": "",
+        "confidence": "S1",
+        "source_doc": "PF.90298",
+        "source_section": "§6.4.1"
+      },
+      {
+        "id": "PR-019",
+        "parameter": "Protection cap removal force",
+        "value": "2 < Rf < 15",
+        "unit": "N",
+        "condition": "",
+        "confidence": "S1",
+        "source_doc": "CTS embedded PDF (oleObject3)"
+      },
+      {
+        "id": "PR-020",
+        "parameter": "Pulsating pressure cycles",
+        "value": "300,000 (std) / 600,000 (stop-start)",
+        "unit": "cycles",
+        "condition": "@rated pressure",
+        "confidence": "S1",
+        "source_doc": "PF.90197",
+        "source_section": "§9.5"
+      },
+      {
+        "id": "PR-021",
+        "parameter": "Corrosion resistance",
+        "value": "15 year life per CS.00251",
+        "unit": "",
+        "condition": "SAE J2334",
+        "confidence": "S1",
+        "source_doc": "PF.90197",
+        "source_section": "§5.3"
+      },
+      {
+        "id": "PR-022",
+        "parameter": "QC latch fatigue",
+        "value": "30 cycles, R95C90",
+        "unit": "cycles",
+        "condition": "disconnect/reconnect",
+        "confidence": "S1",
+        "source_doc": "PF.90298",
+        "source_section": "§9.3"
+      }
+    ],
+    "test_matrix": [
+      {
+        "test_name": "Chemical Resistance",
+        "procedure": "PF.90197 §5.1 / SAE J2044 §7.3",
+        "acceptance": "P99C90, 15 samples",
+        "phase": "DV/PV",
+        "source_doc": "PF.90197"
+      },
+      {
+        "test_name": "Corrosion",
+        "procedure": "SAE J2334 per CS.00251",
+        "acceptance": "P99C90, 15 samples",
+        "phase": "DV/PV",
+        "source_doc": "PF.90197"
+      },
+      {
+        "test_name": "CaCl2 Resistance (EMEA)",
+        "procedure": "PF.90197 §5.4, 200h @60°C",
+        "acceptance": "P99C90, 15 samples",
+        "phase": "DV/PV",
+        "source_doc": "PF.90197"
+      },
+      {
+        "test_name": "ZnCl2 Resistance",
+        "procedure": "SAE J2045, 168h ambient",
+        "acceptance": "P99C90, 15 samples",
+        "phase": "DV/PV",
+        "source_doc": "PF.90197"
+      },
+      {
+        "test_name": "Static Charge Dissipation <S>",
+        "procedure": "SAE J1645 / LP.7A004",
+        "acceptance": "P99C90, 15 samples",
+        "phase": "DV/PV",
+        "source_doc": "PF.90197"
+      },
+      {
+        "test_name": "Clip & Line Insertion/Retention",
+        "procedure": "PF.90197 §6.3.4",
+        "acceptance": "P99C90, 15 samples",
+        "phase": "DV/PV",
+        "source_doc": "PF.90197"
+      },
+      {
+        "test_name": "Fitting Pull-Off",
+        "procedure": "SAE J2045 §4.2",
+        "acceptance": "P99C90, 15 samples @RT + @115°C",
+        "phase": "DV/PV",
+        "source_doc": "PF.90197"
+      },
+      {
+        "test_name": "Internal Fuel Resistance",
+        "procedure": "PF.90197 §6.3.6",
+        "acceptance": "P99C90, 15 samples",
+        "phase": "DV/PV",
+        "source_doc": "PF.90197"
+      },
+      {
+        "test_name": "Internal Cleanliness",
+        "procedure": "SAE J2045 §4.4 / 7.G0200",
+        "acceptance": "P99C90, <=1.5 mg/dm2",
+        "phase": "DV/PV",
+        "source_doc": "PF.90197"
+      },
+      {
+        "test_name": "Leak Resistance <S,E>",
+        "procedure": "SAE J2045 §4.1.4, VLD method",
+        "acceptance": "P99C90, 100% production",
+        "phase": "DV/PV/CC",
+        "source_doc": "PF.90197"
+      },
+      {
+        "test_name": "Pressure Drop/Flow",
+        "procedure": "PF.90197 §7.3, 400kPa test",
+        "acceptance": "P99C90, mean+3σ, 100% production",
+        "phase": "DV/PV/CC",
+        "source_doc": "PF.90197"
+      },
+      {
+        "test_name": "Burst Test",
+        "procedure": "SAE J2045 §4.8 @RT/115°C",
+        "acceptance": "P99C90, >=8x WP @RT, >=3x @115°C",
+        "phase": "DV/PV",
+        "source_doc": "PF.90197"
+      },
+      {
+        "test_name": "Hydrocarbon Permeation <E>",
+        "procedure": "LP.7A005 MiniSHED",
+        "acceptance": "P99C90 DV / R95C90 PV",
+        "phase": "DV/PV",
+        "source_doc": "PF.90197"
+      },
+      {
+        "test_name": "Life Cycle Test",
+        "procedure": "SAE J2045 §4.6",
+        "acceptance": "R95C90, 45 samples",
+        "phase": "DV/PV",
+        "source_doc": "PF.90197"
+      },
+      {
+        "test_name": "Vibration Cycle",
+        "procedure": "PF.90197 §9.4, >=30Hz natural freq",
+        "acceptance": "R95C90, 45 samples",
+        "phase": "DV/PV",
+        "source_doc": "PF.90197"
+      },
+      {
+        "test_name": "Pulsating Pressure",
+        "procedure": "PF.90197 §9.5, 300K/600K cycles",
+        "acceptance": "R95C90, 45 samples",
+        "phase": "DV/PV",
+        "source_doc": "PF.90197"
+      },
+      {
+        "test_name": "QC Low Pressure Leak",
+        "procedure": "SAE J2044 §6.1.1",
+        "acceptance": "<=0.5 cc/min air, P99C90",
+        "phase": "DV/PV",
+        "source_doc": "PF.90298"
+      },
+      {
+        "test_name": "QC High Pressure Leak",
+        "procedure": "SAE J2044 §6.1.3",
+        "acceptance": "<=0.5 cc/min air, P99C90",
+        "phase": "DV/PV",
+        "source_doc": "PF.90298"
+      },
+      {
+        "test_name": "QC Assembly Effort",
+        "procedure": "SAE J2044 §6.2",
+        "acceptance": "<=67N new (<11mm), P99C90",
+        "phase": "DV/PV",
+        "source_doc": "PF.90298"
+      },
+      {
+        "test_name": "QC Pull-Apart Effort",
+        "procedure": "SAE J2044 §6.3",
+        "acceptance": ">=450N unexposed, P99C90",
+        "phase": "DV/PV",
+        "source_doc": "PF.90298"
+      },
+      {
+        "test_name": "QC Side Load",
+        "procedure": "PF.90298 §7.4",
+        "acceptance": "per size table, P99C90",
+        "phase": "DV/PV",
+        "source_doc": "PF.90298"
+      },
+      {
+        "test_name": "QC Dynamic Impact @-30°C",
+        "procedure": "PF.90298 §6.3.5 Charpy",
+        "acceptance": ">=50J metallic, P99C90",
+        "phase": "DV/PV",
+        "source_doc": "PF.90298"
+      },
+      {
+        "test_name": "QC Elevated Temp Burst",
+        "procedure": "SAE J2044 §7.6",
+        "acceptance": ">=3447kPa fuel, P99C90",
+        "phase": "DV/PV",
+        "source_doc": "PF.90298"
+      },
+      {
+        "test_name": "QC Latch Fatigue",
+        "procedure": "PF.90298 §9.3, 30 cycles",
+        "acceptance": "R95C90, 45 samples",
+        "phase": "DV/PV",
+        "source_doc": "PF.90298"
+      },
+      {
+        "test_name": "QC Life Cycling",
+        "procedure": "SAE J2044 §7.5",
+        "acceptance": "R95C90, 45 samples",
+        "phase": "DV/PV",
+        "source_doc": "PF.90298"
+      },
+      {
+        "test_name": "QC Gravel Resistance @-30°C",
+        "procedure": "SAE J400",
+        "acceptance": "P99C90, 15 samples",
+        "phase": "DV/PV",
+        "source_doc": "PF.90298"
+      },
+      {
+        "test_name": "Vehicle Impact (FMVSS 301)",
+        "procedure": "FMVSS 301",
+        "acceptance": "All must pass",
+        "phase": "DV/PV",
+        "source_doc": "PF.90197"
+      },
+      {
+        "test_name": "Vehicle Durability",
+        "procedure": "150,000 miles proving grounds",
+        "acceptance": "All must pass",
+        "phase": "DV/PV",
+        "source_doc": "PF.90197"
+      }
+    ],
+    "special_characteristics": [
+      {
+        "type": "CC",
+        "parameter": "Tube Material Conformity",
+        "requirement": "On drawing",
+        "confidence": "S1",
+        "source_doc": "KPC image (L3)"
+      },
+      {
+        "type": "SC",
+        "parameter": "Tube Dimension",
+        "requirement": "On drawing",
+        "confidence": "S1",
+        "source_doc": "KPC image (L3)"
+      },
+      {
+        "type": "CC",
+        "parameter": "Pressure Seal",
+        "requirement": "On drawing",
+        "confidence": "S1",
+        "source_doc": "KPC image (L3)"
+      },
+      {
+        "type": "SC",
+        "parameter": "Presence of Protecting Caps",
+        "requirement": "On drawing",
+        "confidence": "S1",
+        "source_doc": "KPC image (L3)"
+      },
+      {
+        "type": "SC",
+        "parameter": "Impurities",
+        "requirement": "Acc. to PF-90197",
+        "confidence": "S1",
+        "source_doc": "KPC image (L3)"
+      },
+      {
+        "type": "CC",
+        "parameter": "Pull Off Loads QC/Connections",
+        "requirement": "Acc. to PF-90197",
+        "confidence": "S1",
+        "source_doc": "KPC image (L3)"
+      },
+      {
+        "type": "SC",
+        "parameter": "Leak-tightness / Pressure Seal",
+        "requirement": "No leak at >=150 PSI",
+        "confidence": "S1",
+        "source_doc": "PF.90197 §7.2"
+      },
+      {
+        "type": "SC",
+        "parameter": "QC secondary latch",
+        "requirement": "Required for new designs per PF.90298 §1.8",
+        "confidence": "S1",
+        "source_doc": "PF.90298"
+      },
+      {
+        "type": "SC",
+        "parameter": "Static charge dissipation",
+        "requirement": "Per PF.90197 §6.2.5",
+        "confidence": "S1",
+        "source_doc": "PF.90197"
+      },
+      {
+        "type": "SC",
+        "parameter": "QC Secondary Latch (mandatory for new designs)",
+        "requirement": "Two sequential operations per PF.90298 §1.8",
+        "confidence": "S1",
+        "source_doc": "PF.90298"
+      }
+    ],
+    "referenced_standards": [
+      {
+        "standard_id": "PF.90197",
+        "title": "Fuel Bundle and Fuel System Jumpers",
+        "available": true
+      },
+      {
+        "standard_id": "PF.90298",
+        "title": "Quick Connect – Fuel Systems",
+        "available": true
+      },
+      {
+        "standard_id": "PF.90068",
+        "title": "Diesel Exhaust Fluid - Heated Supply Lines",
+        "available": true
+      },
+      {
+        "standard_id": "PF.90092",
+        "title": "Brake Tube Assembly - Steel Brake Tubing",
+        "available": false
+      },
+      {
+        "standard_id": "CD.80064",
+        "title": "Fuel Bundle Core Documents",
+        "available": false
+      },
+      {
+        "standard_id": "CS.00251",
+        "title": "Corrosion Requirements - Vehicle Systems",
+        "available": false
+      },
+      {
+        "standard_id": "CS-11000",
+        "title": "Trademark Identification on Parts",
+        "available": false
+      },
+      {
+        "standard_id": "CS.00050",
+        "title": "Wiring Design and Package Requirements",
+        "available": false
+      },
+      {
+        "standard_id": "CS.00265",
+        "title": "Substances of Concern Requirements",
+        "available": false
+      },
+      {
+        "standard_id": "CS.CCP-ROUTING",
+        "title": "CCP Routings General Information",
+        "available": false
+      },
+      {
+        "standard_id": "LP.7A004",
+        "title": "Fuel System Electrostatic Charge",
+        "available": false
+      },
+      {
+        "standard_id": "LP.7A005",
+        "title": "Mini-SHED Evaporative Emission Test",
+        "available": false
+      },
+      {
+        "standard_id": "MS.90025/06",
+        "title": "Brazing - Tube, Steel, Double Walled",
+        "available": false
+      },
+      {
+        "standard_id": "PF-EMISSIONS",
+        "title": "Identification of Emissions Items",
+        "available": false
+      },
+      {
+        "standard_id": "PF-SAFETY",
+        "title": "Product Safety - Use of Safety Shields",
+        "available": false
+      },
+      {
+        "standard_id": "PS.50005/06",
+        "title": "Welding - Tubes",
+        "available": false
+      },
+      {
+        "standard_id": "PS-11346",
+        "title": "Warranty Returned Parts Testing",
+        "available": false
+      },
+      {
+        "standard_id": "LP.7M114",
+        "title": "Plastics Moisture Conditioning Polyamide",
+        "available": false
+      },
+      {
+        "standard_id": "PS-4480",
+        "title": "Identification of Parts",
+        "available": false
+      },
+      {
+        "standard_id": "PS-8688",
+        "title": "Coatings for Steel Tubing",
+        "available": false
+      },
+      {
+        "standard_id": "QR.00001",
+        "title": "Global Product Assurance Testing (GPAT)",
+        "available": false
+      },
+      {
+        "standard_id": "QR-10012",
+        "title": "Dimensional Quality Requirements",
+        "available": false
+      },
+      {
+        "standard_id": "SD-11597",
+        "title": "Fuel Compatibility List",
+        "available": false
+      },
+      {
+        "standard_id": "SD-M0008/03",
+        "title": "Plastic Fuel Line Requirements/Approvals",
+        "available": false
+      },
+      {
+        "standard_id": "9.02145",
+        "title": "Double-Wall Steel Tubing for Fuel and Brake",
+        "available": false
+      },
+      {
+        "standard_id": "9.02145/02",
+        "title": "Electrowelded Steel Pipes for Fuel Circuits",
+        "available": false
+      },
+      {
+        "standard_id": "07416",
+        "title": "Recycling Markings for Plastic/Composite/Elastomer",
+        "available": false
+      },
+      {
+        "standard_id": "7.G0200",
+        "title": "Internal Cleanliness - Flux Method",
+        "available": false
+      },
+      {
+        "standard_id": "7.N0007",
+        "title": "Components Noise Testing",
+        "available": false
+      },
+      {
+        "standard_id": "DS-107",
+        "title": "BSR Design Guidelines",
+        "available": false
+      },
+      {
+        "standard_id": "0.00013",
+        "title": "Marking of Manufacture Date",
+        "available": false
+      },
+      {
+        "standard_id": "07610",
+        "title": "Supplier Alphanumeric Codes",
+        "available": false
+      },
+      {
+        "standard_id": "CS-9003",
+        "title": "Restricted and Prohibited Substances",
+        "available": false
+      },
+      {
+        "standard_id": "FMVSS 301",
+        "title": "Fuel System Integrity",
+        "available": false
+      },
+      {
+        "standard_id": "MS-10756",
+        "title": "Ultra Low Sulfur Diesel Test Fuel",
+        "available": false
+      },
+      {
+        "standard_id": "MS-8004",
+        "title": "Tier 2 Indolene Emissions Test Fuel",
+        "available": false
+      },
+      {
+        "standard_id": "PS-7300",
+        "title": "Product Quality - Use of Diamonds",
+        "available": false
+      },
+      {
+        "standard_id": "SAE J1645",
+        "title": "Fuel System Electrostatic Charge Mitigation",
+        "available": false
+      },
+      {
+        "standard_id": "SAE J2044",
+        "title": "Quick Connect Coupling Specification",
+        "available": false
+      },
+      {
+        "standard_id": "SAE J2045",
+        "title": "Performance Requirements Fuel System Tubing",
+        "available": false
+      },
+      {
+        "standard_id": "SAE J2260",
+        "title": "Nonmetallic Fuel System Tubing Multi-Layer",
+        "available": false
+      },
+      {
+        "standard_id": "SAE J2334",
+        "title": "Laboratory Cyclic Corrosion Test",
+        "available": false
+      },
+      {
+        "standard_id": "SAE J400",
+        "title": "Test for Chip Resistance of Coatings",
+        "available": false
+      },
+      {
+        "standard_id": "SAE J1677",
+        "title": "Carbon/Low Alloy Steel Tubing Test",
+        "available": false
+      },
+      {
+        "standard_id": "SAE J2027",
+        "title": "Protective Covers for Fuel Line Tubing",
+        "available": false
+      },
+      {
+        "standard_id": "DIN 51604",
+        "title": "FAM Testing Fluid for Polymer Materials",
+        "available": false
+      },
+      {
+        "standard_id": "DIN 53504",
+        "title": "Tensile Properties of Rubber",
+        "available": false
+      },
+      {
+        "standard_id": "EN 14214",
+        "title": "Fatty Acid Methyl Esters (FAME) for Diesel",
+        "available": false
+      },
+      {
+        "standard_id": "EN ISO 527-2",
+        "title": "Plastics Tensile Properties",
+        "available": false
+      },
+      {
+        "standard_id": "MS.50017",
+        "title": "Plastics - Thermoplastic - Polyamide (Nylon)",
+        "available": false
+      },
+      {
+        "standard_id": "MS.50015",
+        "title": "Thermoplastic Vulcanizates EPDM/PP",
+        "available": false
+      },
+      {
+        "standard_id": "9.14618",
+        "title": "Rubber O-rings Seals",
+        "available": false
+      },
+      {
+        "standard_id": "PF.90271",
+        "title": "Electrical Insulating Components Wiring Harness",
+        "available": false
+      },
+      {
+        "standard_id": "MS.90111",
+        "title": "Tape",
+        "available": false
+      },
+      {
+        "standard_id": "9.55253",
+        "title": "Miscellaneous Plastic Component",
+        "available": false
+      },
+      {
+        "standard_id": "CS.00080",
+        "title": "CAD Standard",
+        "available": false
+      },
+      {
+        "standard_id": "9.01102",
+        "title": "Supplier Quality",
+        "available": false
+      },
+      {
+        "standard_id": "9.01103",
+        "title": "Product Quality Conformity Certificate",
+        "available": false
+      },
+      {
+        "standard_id": "07740",
+        "title": "Qualification Procedure",
+        "available": false
+      },
+      {
+        "standard_id": "00270",
+        "title": "Product FMEA (CS.00133)",
+        "available": false
+      },
+      {
+        "standard_id": "00271",
+        "title": "Process FMEA",
+        "available": false
+      },
+      {
+        "standard_id": "9.01108",
+        "title": "Restricted/Forbidden Substances (FGA)",
+        "available": false
+      },
+      {
+        "standard_id": "00256",
+        "title": "Recyclable Solutions Design Criteria",
+        "available": false
+      },
+      {
+        "standard_id": "9.01111",
+        "title": "Ergonomics",
+        "available": false
+      }
+    ],
+    "quality_targets": {
+      "tesis_underbody": {
+        "3m": "0.00",
+        "12m": "0.035",
+        "24m": "0.089",
+        "36m": "0.120",
+        "unit": "c/1000 vehicles"
+      },
+      "tesis_engine_compartment": {
+        "3m": "0.00",
+        "12m": "0.065",
+        "24m": "0.160",
+        "36m": "0.365",
+        "unit": "c/1000 vehicles"
+      },
+      "icp_goal": "0 for single component",
+      "reliability_confidence": "P99C90 (functional) / P95C90 (durability)",
+      "self_qualification_annual": true,
+      "imds_required": true,
+      "safety_defects": "not allowed"
+    },
+    "material_compliance": {
+      "restricted": [
+        "Pb",
+        "Hg",
+        "Cd",
+        "Cr6+"
+      ],
+      "standards": [
+        "EU Dir.2000/53/CE (ELV)",
+        "REACH Reg.1907/2006",
+        "FGA Spec 9.01108"
+      ],
+      "imds_required": true,
+      "pvc_minimize": true,
+      "deca_bde_banned_us": true,
+      "marking": "Fiat standard 07416",
+      "confidence": "S1",
+      "source_doc": "CTS embedded PDF (oleObject2)"
+    },
+    "deliverables_required": [
+      {
+        "id": "D-01",
+        "name": "Co-Design Cost Breakdown (ED&D PBD)",
+        "phase": "SOURCING",
+        "template_available": true,
+        "template_file": "artifacts/_embedded/L2/SSTS_KP1_Fuel_line_Microsoft_Word_Document_Microsoft_Excel_Worksheet.xlsx",
+        "filled_by_node": "n12"
+      },
+      {
+        "id": "D-02",
+        "name": "Component Development Sheet (CDS)",
+        "phase": "SOURCING",
+        "template_available": false,
+        "template_file": null,
+        "filled_by_node": "n14"
+      },
+      {
+        "id": "D-03",
+        "name": "3D Model (UG .prt / TCAE / Parasolid)",
+        "phase": "TKO",
+        "template_available": false,
+        "template_file": null,
+        "filled_by_node": null
+      },
+      {
+        "id": "D-04",
+        "name": "Supplier Development Team (SDT)",
+        "phase": "SOURCING",
+        "template_available": true,
+        "template_file": "artifacts/_embedded/L2/SSTS_KP1_Fuel_line_Microsoft_Word_Document_Microsoft_Excel_Worksheet1.xlsx",
+        "filled_by_node": "n14"
+      },
+      {
+        "id": "D-05",
+        "name": "List of Exception (Deviation List)",
+        "phase": "SOURCING",
+        "template_available": true,
+        "template_file": "artifacts/_embedded/L2/SSTS_KP1_Fuel_line_Microsoft_Word_Document_Microsoft_Excel_Worksheet2.xlsx",
+        "filled_by_node": "n15"
+      },
+      {
+        "id": "D-06",
+        "name": "RASI Chart",
+        "phase": "SOURCING",
+        "template_available": true,
+        "template_file": "artifacts/_embedded/L2/SSTS_KP1_Fuel_line_Microsoft_Word_Document_Microsoft_Excel_Worksheet3.xlsx",
+        "filled_by_node": "n14"
+      },
+      {
+        "id": "D-07",
+        "name": "Additional Material List (DV/PV test materials)",
+        "phase": "DV",
+        "template_available": true,
+        "template_file": "artifacts/_embedded/L2/SSTS_KP1_Fuel_line_Microsoft_Word_Document_Microsoft_Excel_Worksheet4.xlsx",
+        "filled_by_node": "n09"
+      },
+      {
+        "id": "D-08",
+        "name": "DVP&R Plan (DV+PV)",
+        "phase": "DV",
+        "template_available": true,
+        "template_file": "inputs/STLA-DVPR模板.xlsx",
+        "filled_by_node": "n09"
+      },
+      {
+        "id": "D-09",
+        "name": "Virtual Analysis",
+        "phase": "SOURCING",
+        "template_available": false,
+        "template_file": null,
+        "filled_by_node": null
+      },
+      {
+        "id": "D-10",
+        "name": "Product and Process FMEA",
+        "phase": "TKO",
+        "template_available": false,
+        "template_file": null,
+        "filled_by_node": "n07"
+      },
+      {
+        "id": "D-11",
+        "name": "Complete 2D Drawings",
+        "phase": "TKO",
+        "template_available": false,
+        "template_file": null,
+        "filled_by_node": null
+      },
+      {
+        "id": "D-12",
+        "name": "IMDS Material Data Sheet",
+        "phase": "SOP",
+        "template_available": false,
+        "template_file": null,
+        "filled_by_node": null
+      },
+      {
+        "id": "D-13",
+        "name": "Best Practices Sharing",
+        "phase": "SOURCING",
+        "template_available": false,
+        "template_file": null,
+        "filled_by_node": null
+      },
+      {
+        "id": "D-14",
+        "name": "Support SOP at Assembly Plant",
+        "phase": "SOP",
+        "template_available": false,
+        "template_file": null,
+        "filled_by_node": null
+      }
+    ],
+    "file_roles": [
+      {
+        "file": "inputs/SSTS KP1 Fuel line.xlsx",
+        "role": "采购技术总要求 (SSTS)",
+        "layer": "L0"
+      },
+      {
+        "file": "inputs/PF.90197.pdf",
+        "role": "性能标准 — 燃油管路主规范",
+        "layer": "L0"
+      },
+      {
+        "file": "inputs/PF.90298_QC.pdf",
+        "role": "性能标准 — 快速接头",
+        "layer": "L0"
+      },
+      {
+        "file": "inputs/PF.90068.pdf",
+        "role": "性能标准 — DEF加热管线 (参考)",
+        "layer": "L0"
+      },
+      {
+        "file": "inputs/KP1 Fuel line damper description.pptx",
+        "role": "零件描述 — 阻尼器",
+        "layer": "L0"
+      },
+      {
+        "file": "inputs/STLA-DVPR模板.xlsx",
+        "role": "报价模板 — DVPR",
+        "layer": "L0"
+      }
+    ],
+    "embedded_files": [
+      {
+        "file": "L1/SSTS_KP1_Fuel_line_Microsoft_Word_Document.docx",
+        "role": "TDR交付物清单",
+        "source": "SSTS xlsx"
+      },
+      {
+        "file": "L1/SSTS_KP1_Fuel_line_Microsoft_Word_Document1.docx",
+        "role": "CTS零部件技术规范",
+        "source": "SSTS xlsx"
+      },
+      {
+        "file": "L1/SSTS_KP1_Fuel_line_Microsoft_Excel_Worksheet.xlsx",
+        "role": "SSTS附表",
+        "source": "SSTS xlsx"
+      },
+      {
+        "file": "L2/SSTS_KP1_Fuel_line_Microsoft_Word_Document1_Microsoft_PowerPoint_Presentation.pptx",
+        "role": "CTS附件 — 管路尺寸/走向 (关键)",
+        "source": "CTS docx"
+      },
+      {
+        "file": "L3/SSTS_KP1_Fuel_line_Microsoft_Word_Document1_oleObject1_extracted.jpg",
+        "role": "KPC特殊特性表",
+        "source": "CTS docx"
+      },
+      {
+        "file": "L3/SSTS_KP1_Fuel_line_Microsoft_Word_Document1_oleObject2_extracted.pdf",
+        "role": "材料合规要求 (ELV/REACH)",
+        "source": "CTS docx"
+      },
+      {
+        "file": "L3/SSTS_KP1_Fuel_line_Microsoft_Word_Document1_oleObject3_extracted.pdf",
+        "role": "保护帽规格",
+        "source": "CTS docx"
+      },
+      {
+        "file": "L2/SSTS_KP1_Fuel_line_Microsoft_Word_Document1_Microsoft_Excel_Worksheet.xlsx",
+        "role": "SVP Form — 自验证计划模板",
+        "source": "CTS docx"
+      },
+      {
+        "file": "L2/SSTS_KP1_Fuel_line_Microsoft_Word_Document_Microsoft_Excel_Worksheet.xlsx",
+        "role": "客户模板 — Co-Design Cost Breakdown (ED&D PBD)",
+        "source": "TDR docx"
+      },
+      {
+        "file": "L2/SSTS_KP1_Fuel_line_Microsoft_Word_Document_Microsoft_Excel_Worksheet1.xlsx",
+        "role": "客户模板 — Supplier Development Team (SDT)",
+        "source": "TDR docx"
+      },
+      {
+        "file": "L2/SSTS_KP1_Fuel_line_Microsoft_Word_Document_Microsoft_Excel_Worksheet2.xlsx",
+        "role": "客户模板 — List of Exception (Deviation List)",
+        "source": "TDR docx"
+      },
+      {
+        "file": "L2/SSTS_KP1_Fuel_line_Microsoft_Word_Document_Microsoft_Excel_Worksheet3.xlsx",
+        "role": "客户模板 — RASI Chart",
+        "source": "TDR docx"
+      },
+      {
+        "file": "L2/SSTS_KP1_Fuel_line_Microsoft_Word_Document_Microsoft_Excel_Worksheet4.xlsx",
+        "role": "客户模板 — Additional Material List (DV/PV test materials)",
+        "source": "TDR docx"
+      }
+    ],
+    "source_index": {
+      "ssts_top_level": "inputs/SSTS KP1 Fuel line.xlsx",
+      "main_performance_spec": "inputs/PF.90197.pdf",
+      "qc_connector_spec": "inputs/PF.90298_QC.pdf",
+      "def_line_spec": "inputs/PF.90068.pdf",
+      "damper_description": "inputs/KP1 Fuel line damper description.pptx",
+      "dvpr_template": "inputs/STLA-DVPR模板.xlsx",
+      "tdr_deliverable_list": "artifacts/_embedded/L1/SSTS_KP1_Fuel_line_Microsoft_Word_Document.docx",
+      "cts_main_docx": "artifacts/_embedded/L1/SSTS_KP1_Fuel_line_Microsoft_Word_Document1.docx",
+      "routing_and_packaging": "artifacts/_embedded/L2/SSTS_KP1_Fuel_line_Microsoft_Word_Document1_Microsoft_PowerPoint_Presentation.pptx",
+      "kpc_table": "artifacts/_embedded/L3/SSTS_KP1_Fuel_line_Microsoft_Word_Document1_oleObject1_extracted.jpg",
+      "material_compliance": "artifacts/_embedded/L3/SSTS_KP1_Fuel_line_Microsoft_Word_Document1_oleObject2_extracted.pdf",
+      "protection_caps_spec": "artifacts/_embedded/L3/SSTS_KP1_Fuel_line_Microsoft_Word_Document1_oleObject3_extracted.pdf",
+      "edd_pbd_template": "artifacts/_embedded/L2/SSTS_KP1_Fuel_line_Microsoft_Word_Document_Microsoft_Excel_Worksheet.xlsx",
+      "sdt_template": "artifacts/_embedded/L2/SSTS_KP1_Fuel_line_Microsoft_Word_Document_Microsoft_Excel_Worksheet1.xlsx",
+      "exception_list_template": "artifacts/_embedded/L2/SSTS_KP1_Fuel_line_Microsoft_Word_Document_Microsoft_Excel_Worksheet2.xlsx",
+      "rasi_template": "artifacts/_embedded/L2/SSTS_KP1_Fuel_line_Microsoft_Word_Document_Microsoft_Excel_Worksheet3.xlsx",
+      "component_test_template": "artifacts/_embedded/L2/SSTS_KP1_Fuel_line_Microsoft_Word_Document_Microsoft_Excel_Worksheet4.xlsx",
+      "svp_form_template": "artifacts/_embedded/L2/SSTS_KP1_Fuel_line_Microsoft_Word_Document1_Microsoft_Excel_Worksheet.xlsx"
+    }
+  },
+  "produced_at": "2026-03-18T04:36:42.108902+00:00"
+}

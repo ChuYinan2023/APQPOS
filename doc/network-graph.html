@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APQP 信息流网络图</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Noto+Sans+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#060a14;
+  --auto:#00e87a;--mixed:#00c8ff;--human:#ff6b35;--ext:#5577aa;
+  --feedback:#ffaa00;--risk:#ff3355;--b1:#9966ff;
+  --text:#d0e4f4;--muted:#5a7898;
+  --panel-w:272px;
+}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-serif;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(circle at 1px 1px,rgba(40,80,140,.22) 1px,transparent 0);
+  background-size:30px 30px;z-index:0;pointer-events:none}
+
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:200;
+  background:rgba(6,10,20,.94);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(0,200,255,.14);padding:12px 28px;
+  display:flex;align-items:center;justify-content:space-between}
+.hdr-title{font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--mixed);letter-spacing:.12em}
+.hdr-sub{font-size:10.5px;color:var(--muted);margin-top:3px;letter-spacing:.04em}
+.legend{display:flex;align-items:center;gap:18px;margin-right:calc(var(--panel-w) + 8px)}
+.leg{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted)}
+.leg-box{width:11px;height:11px;border-radius:3px;border:1.5px solid}
+.leg-line{width:26px;height:2px;border-radius:1px}
+
+/* SCROLL */
+.scroll{overflow:auto;padding:24px 32px 60px;position:relative;z-index:1;
+  margin-right:var(--panel-w)}
+#canvas{position:relative;width:1540px;height:1720px}
+#svg{position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;overflow:visible}
+
+/* NODES */
+.nd{position:absolute;transform:translate(-50%,-50%);
+  background:rgba(7,12,26,.9);border:1.5px solid;border-radius:7px;
+  padding:8px 10px 8px 10px;cursor:pointer;z-index:10;
+  transition:transform .17s ease,box-shadow .17s ease;backdrop-filter:blur(4px)}
+.nd:hover{transform:translate(-50%,-50%) scale(1.06);z-index:60}
+.nd.auto{border-color:var(--auto)}
+.nd.auto:hover{box-shadow:0 0 22px rgba(0,232,122,.35)}
+.nd.mixed{border-color:var(--mixed)}
+.nd.mixed:hover{box-shadow:0 0 22px rgba(0,200,255,.35)}
+.nd.human{border-color:var(--human)}
+
+/* network highlight states */
+.nd.nd-dim{opacity:.12;transition:opacity .2s,transform .17s,box-shadow .17s}
+.nd.nd-rel{opacity:1;transition:opacity .2s,transform .17s,box-shadow .17s}
+.nd.nd-rel.auto{box-shadow:0 0 18px rgba(0,232,122,.28)}
+.nd.nd-rel.mixed{box-shadow:0 0 18px rgba(0,200,255,.28)}
+.nd.nd-rel.human{box-shadow:0 0 18px rgba(255,107,53,.28)}
+.nd.nd-rel.ext{box-shadow:0 0 14px rgba(85,119,170,.22)}
+.nd.human:hover{box-shadow:0 0 22px rgba(255,107,53,.35)}
+.nd.ext{border-color:var(--ext);border-style:dashed;opacity:.72}
+.nd-id{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:3px;letter-spacing:.08em}
+.nd-name{font-size:12px;font-weight:500;line-height:1.35;color:#e8f2ff}
+.nd-badge{position:absolute;bottom:6px;right:8px;font-size:12px;line-height:1}
+.nd-risk{position:absolute;top:-9px;right:-9px;width:18px;height:18px;
+  background:var(--risk);border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:9px;color:#fff;font-weight:700;
+  box-shadow:0 0 8px rgba(255,51,85,.7);z-index:20}
+
+/* ── RIGHT SIDEBAR ─────────────────────────────── */
+#sidebar{
+  position:fixed;right:0;top:0;bottom:0;width:var(--panel-w);
+  display:flex;flex-direction:row;
+  z-index:150;
+}
+
+/* The wide accent bar on the left edge */
+#sb-accent{
+  width:10px;flex-shrink:0;
+  background:rgba(255,255,255,.04);
+  transition:background .25s;
+}
+#sidebar.type-auto  #sb-accent{background:var(--auto)}
+#sidebar.type-mixed #sb-accent{background:var(--mixed)}
+#sidebar.type-human #sb-accent{background:var(--human)}
+#sidebar.type-ext   #sb-accent{background:var(--ext)}
+
+/* Content area */
+#sb-content{
+  flex:1;overflow-y:auto;
+  background:rgba(5,9,19,.97);
+  border-left:1px solid rgba(255,255,255,.06);
+  backdrop-filter:blur(16px);
+  display:flex;flex-direction:column;
+}
+#sb-content::-webkit-scrollbar{width:3px}
+#sb-content::-webkit-scrollbar-track{background:transparent}
+#sb-content::-webkit-scrollbar-thumb{background:rgba(0,200,255,.15);border-radius:2px}
+
+/* ── IDLE VIEW (artifact list) ── */
+#sb-idle{flex:1;display:flex;flex-direction:column}
+#sb-idle-hdr{
+  padding:14px 16px 10px;
+  border-bottom:1px solid rgba(255,255,255,.05);
+  flex-shrink:0;
+}
+#sb-idle-hdr .ttl{
+  font-family:'Share Tech Mono',monospace;font-size:9.5px;
+  color:rgba(0,200,255,.6);letter-spacing:.14em;
+}
+#sb-idle-hdr .hint{font-size:9px;color:var(--muted);margin-top:4px}
+#sb-idle-body{flex:1;overflow-y:auto;padding:8px 0 24px}
+#sb-idle-body::-webkit-scrollbar{width:0}
+
+.ap-group{padding:4px 14px 2px}
+.ap-group-label{
+  display:flex;align-items:center;gap:6px;
+  font-family:'Share Tech Mono',monospace;font-size:8px;
+  color:var(--muted);letter-spacing:.08em;
+  padding:5px 0 4px;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  margin-bottom:3px;
+}
+.ap-group-label .gnid{color:rgba(0,200,255,.35)}
+.ap-group-label .gname{color:rgba(200,220,240,.35)}
+.ap-group-label .gbadge{font-size:10px;margin-left:auto}
+.ap-item{
+  display:block;font-size:9.5px;color:#304858;
+  padding:3px 8px 3px 10px;
+  border-left:2px solid rgba(0,200,255,.05);
+  border-radius:0 3px 3px 0;
+  margin-bottom:2px;line-height:1.45;
+  transition:color .18s,border-color .18s,background .18s,transform .15s;
+  cursor:default;
+}
+.ap-item .art-arrow{color:rgba(0,200,255,.18);margin:0 2px;font-size:8.5px}
+.ap-item .art-dest{color:#223040;font-size:8.5px}
+.ap-item.hl{color:#aaccee;border-left-color:var(--mixed);background:rgba(0,200,255,.07);transform:translateX(2px)}
+.ap-item.hl .art-arrow{color:rgba(0,200,255,.45)}
+.ap-item.hl .art-dest{color:#4e7898}
+.ap-item.dim{color:#182430;opacity:.35}
+.ap-group[data-type="auto"] .ap-item.hl{border-left-color:var(--auto);background:rgba(0,232,122,.06)}
+.ap-group[data-type="human"] .ap-item.hl{border-left-color:var(--human);background:rgba(255,107,53,.06)}
+.ap-group[data-type="ext"] .ap-item.hl{border-left-color:var(--ext);background:rgba(85,119,170,.07)}
+
+/* ── ACTIVE VIEW (node detail) ── */
+#sb-active{
+  display:none;flex-direction:column;flex:1;
+  padding:24px 20px 32px;
+}
+#sidebar.active #sb-idle{display:none}
+#sidebar.active #sb-active{display:flex}
+
+.sa-nid{
+  font-family:'Share Tech Mono',monospace;font-size:9px;
+  letter-spacing:.12em;margin-bottom:6px;
+}
+.sa-name{font-size:18px;font-weight:600;color:#eaf4ff;line-height:1.25;margin-bottom:4px}
+.sa-badge{font-size:22px;margin-bottom:14px;display:block}
+.sa-def{
+  font-size:11px;color:#607898;line-height:1.7;
+  margin-bottom:16px;
+  padding-bottom:16px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.sa-exec{
+  display:inline-block;padding:3px 10px;border-radius:4px;
+  font-size:9.5px;font-family:'Share Tech Mono',monospace;
+  margin-bottom:20px;
+}
+.sa-exec.auto {background:rgba(0,232,122,.1);color:var(--auto);border:1px solid rgba(0,232,122,.22)}
+.sa-exec.mixed{background:rgba(0,200,255,.1);color:var(--mixed);border:1px solid rgba(0,200,255,.22)}
+.sa-exec.human{background:rgba(255,107,53,.1);color:var(--human);border:1px solid rgba(255,107,53,.22)}
+.sa-lbl{
+  font-family:'Share Tech Mono',monospace;font-size:8px;
+  letter-spacing:.16em;text-transform:uppercase;
+  margin-bottom:8px;margin-top:0;
+  opacity:.4;
+}
+.sa-rows{margin-bottom:18px}
+.sa-row{
+  font-size:10.5px;color:#5a7a98;line-height:1.7;
+  padding-left:12px;position:relative;
+}
+.sa-row::before{content:'›';position:absolute;left:0;opacity:.4}
+.sa-divider{height:1px;background:rgba(255,255,255,.05);margin:16px 0}
+.sa-risk{
+  padding:10px 12px;margin-top:4px;
+  background:rgba(255,51,85,.07);
+  border:1px solid rgba(255,51,85,.2);
+  border-radius:5px;font-size:10px;color:#d06070;line-height:1.6;
+}
+.sa-risk::before{content:'⚠  ';font-weight:700;color:var(--risk)}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <div class="hdr-title">APQP · 信息流网络图 · v4.3</div>
+    <div class="hdr-sub">FC00SAA78530 &nbsp;·&nbsp; Stellantis KP1 A&B &nbsp;·&nbsp; Fuel Supply Line Filter to Engine</div>
+  </div>
+  <div class="legend">
+    <div class="leg"><div class="leg-box" style="border-color:var(--auto)"></div>AI全自动</div>
+    <div class="leg"><div class="leg-box" style="border-color:var(--mixed)"></div>AI + 人工</div>
+    <div class="leg"><div class="leg-box" style="border-color:var(--human)"></div>纯人工</div>
+    <div class="leg"><div class="leg-line" style="background:var(--risk)"></div>硬性阻断</div>
+    <div class="leg"><div class="leg-line" style="border-top:2px dashed var(--feedback);background:none"></div>反馈循环</div>
+    <div class="leg"><div class="leg-line" style="background:var(--b1);opacity:.6"></div>内部B1数据</div>
+  </div>
+</div>
+
+<div class="scroll">
+  <div id="canvas">
+    <svg id="svg"></svg>
+    <div id="nlayer"></div>
+  </div>
+</div>
+
+<!-- RIGHT SIDEBAR -->
+<div id="sidebar">
+  <div id="sb-accent"></div>
+  <div id="sb-content">
+    <!-- IDLE: artifact list -->
+    <div id="sb-idle">
+      <div id="sb-idle-hdr">
+        <div class="ttl">OUTPUT ARTIFACTS</div>
+        <div class="hint">悬停节点查看详情 · 高亮对应输出</div>
+      </div>
+      <div id="sb-idle-body"></div>
+    </div>
+    <!-- ACTIVE: node detail -->
+    <div id="sb-active"></div>
+  </div>
+</div>
+
+<script>
+const NW=170,NH=74,EW=148,EH=54;
+
+const NODES=[
+  {id:'ext-rfq', type:'ext', name:'RfQ 文件包', sub:'PPTX · SSTS · PDF规范', cx:220,cy:82, w:EW,h:EH, badge:'📄',
+   def:'客户发来的询价文件包', exec:null,
+   ins:[],outs:['解析字段表','信息缺口清单']},
+  {id:'ext-reg', type:'ext', name:'法规文本', sub:'平台主动匹配', cx:480,cy:82, w:EW,h:EH, badge:'📋',
+   def:'按产品类别+市场区域主动匹配的适用法规', exec:null,
+   ins:[],outs:['解析字段表']},
+  {id:'ext-3d',  type:'ext', name:'3D 数模文件', sub:'UG .prt / Parasolid', cx:820,cy:82, w:EW,h:EH, badge:'📐',
+   def:'客户Teamcenter中的几何定义文件', exec:null,
+   ins:[],outs:['几何参数表'],
+   risk:'必须从客户Teamcenter获取，整条技术主干的唯一几何来源'},
+  {id:'ext-b1',  type:'ext', name:'内部 B1 数据库', sub:'费率·工艺·供应商', cx:1360,cy:82, w:EW,h:EH, badge:'🗄',
+   def:'企业内部知识库：工艺能力清单、人机费率、供应商牌号库、历史数据', exec:null,
+   ins:[],outs:['各节点所需费率、工艺能力、供应商数据']},
+
+  {id:'n01', nid:'NODE-01', type:'auto',  name:'需求解析', cx:350,cy:215, w:NW,h:NH, badge:'🤖',
+   def:'提取客户文件所有信息字段，递归找齐引用文件，法规比对，标注信息缺口，路由给下游节点',
+   exec:'auto', exlabel:'🤖 AI全自动',
+   ins:['RfQ文件包 ← 客户','法规文本 ← 平台主动匹配'],
+   outs:['解析字段表 → DRG/所有下游节点','信息缺口清单 → 报价']},
+
+  {id:'n02', nid:'NODE-02', type:'auto',  name:'DRG 设计要求指南', cx:350,cy:375, w:NW,h:NH, badge:'🤖',
+   def:'将规范条款和使用场景描述翻译成可量化、可测试的工程指标表（本项目：提取PF.90197 §5-9共45条指标）',
+   exec:'auto', exlabel:'🤖 AI自动；描述性要求工程师确认',
+   ins:['解析字段表 ← NODE-01','DFMEA修正请求 ← NODE-07（反馈循环）'],
+   outs:['DRG量化指标表 → 3D数模/DFMEA/DVP&R']},
+
+  {id:'n03', nid:'NODE-03', type:'human', name:'3D 数模解析', cx:700,cy:530, w:NW,h:NH, badge:'👤', risk:true,
+   def:'工程师打开NX，按结构化表单提取几何参数；同时完成Make or Buy第一级判断（工艺能力+标准件匹配）',
+   exec:'human', exlabel:'👤 工程师人工操作',
+   ins:['3D数模文件 ← 客户Teamcenter','DRG量化指标表 ← NODE-02','本公司工艺能力库 ← B1'],
+   outs:['几何参数表 → BOM/材料选型/用量/DFMEA/工艺路线','Make/Buy候选清单 → BOM'],
+   risk:'硬性阻断：3D文件未到，整条技术主干停止'},
+
+  {id:'n04', nid:'NODE-04', type:'mixed', name:'BOM', cx:130,cy:710, w:NW,h:NH, badge:'🤝',
+   def:'建立产品完整零件清单，继承Make/Buy候选标注，处理第二级例外（材料匹配失败/Tier1主动推翻）',
+   exec:'mixed', exlabel:'🤝 AI初稿 + 工程师确认',
+   ins:['几何参数表 ← NODE-03','Make/Buy候选清单 ← NODE-03'],
+   outs:['BOM清单（含Make/Buy标注）→ 材料选型/用量/PFD']},
+
+  {id:'n05', nid:'NODE-05', type:'mixed', name:'材料选型', cx:350,cy:710, w:NW,h:NH, badge:'🤝',
+   def:'将材料规格目标值匹配到具体供应商+牌号+单价；匹配失败走三条退化路径',
+   exec:'mixed', exlabel:'🤝 AI匹配 + 采购人员确认',
+   ins:['材料规格目标值 ← NODE-03','BOM清单 ← NODE-04','供应商牌号库 ← B1'],
+   outs:['选型结果（供应商+牌号+单价）→ 物料成本','匹配失败清单 → 报价条件缺口']},
+
+  {id:'n06', nid:'NODE-06', type:'auto',  name:'用量计算', cx:570,cy:710, w:NW,h:NH, badge:'🤖',
+   def:'从几何参数和BOM推导每种物料的实际用量',
+   exec:'auto', exlabel:'🤖 AI全自动',
+   ins:['几何参数表 ← NODE-03','BOM清单 ← NODE-04'],
+   outs:['物料用量清单 → 物料成本']},
+
+  {id:'n07', nid:'NODE-07', type:'mixed', name:'DFMEA', cx:860,cy:710, w:NW,h:NH, badge:'🤝',
+   def:'对每个产品功能系统性分析失效模式、原因和RPN；输出驱动测试计划、工艺约束、DRG修正',
+   exec:'mixed', exlabel:'🤝 AI生成框架 + 工程师填S/O/D值',
+   ins:['DRG量化指标表 ← NODE-02','几何参数表 ← NODE-03'],
+   outs:['失效模式清单 → DVP&R/工艺路线（特殊工艺要求）','DRG修正请求 → NODE-02（反馈）']},
+
+  {id:'n08', nid:'NODE-08', type:'mixed', name:'工艺路线', cx:1110,cy:710, w:NW,h:NH, badge:'🤝',
+   def:'将几何参数翻译成制造工序、设备类型、标准时间和损耗率；确认Make/外协分工',
+   exec:'mixed', exlabel:'🤝 AI主路径 + 工程师确认外协',
+   ins:['几何参数表 ← NODE-03','DFMEA特殊工艺要求 ← NODE-07','年需求量 ← NODE-01','工艺能力库 ← B1','外协市场价 ← B1'],
+   outs:['工艺路线表（工序+时间+损耗率）→ PFD/物料成本/转化成本/生产能力','并行设备需求+工作中心类型 → 生产能力物理载体'],
+   risk:'中度风险：年需求量缺失，节拍无法计算，设备需求无法判断'},
+
+  {id:'n09', nid:'NODE-09', type:'mixed', name:'DVP&R 验证计划', cx:360,cy:920, w:NW,h:NH, badge:'🤝',
+   def:'将DRG指标和DFMEA失效模式映射为完整DV+PV测试计划；本项目共20+测试项（PF.90197 Annex A）',
+   exec:'mixed', exlabel:'🤝 AI生成初版 + 工程师确认',
+   ins:['DRG量化指标表 ← NODE-02','失效模式清单 ← NODE-07','DVP&R模板 ← NODE-01'],
+   outs:['DV+PV测试计划 → ED&D（测试费用）/报价交付物'],
+   risk:'07740标准缺失，样品数量按Annex A默认（15件P99C90 / 45件R95C90）'},
+
+  {id:'n10', nid:'NODE-10', type:'mixed', name:'PFD + 控制计划', cx:980,cy:920, w:NW,h:NH, badge:'🤝',
+   def:'基于约束有向图推导工序顺序，定义每道工序的过程特性规范值和专用检具需求',
+   exec:'mixed', exlabel:'🤝 AI生成 + 工程师确认',
+   ins:['工艺路线表 ← NODE-08','几何参数表（装配约束）← NODE-03','失效模式清单 ← NODE-07','BOM ← NODE-04'],
+   outs:['工序顺序图+过程特性规范值 → 生产能力物理载体','专用检具需求 → 生产能力物理载体']},
+
+  {id:'n11', nid:'NODE-11', type:'auto',  name:'物料成本', cx:200,cy:1110, w:NW,h:NH, badge:'🤖',
+   def:'汇总所有物料成本：Σ（用量 × 单价 × 损耗系数）',
+   exec:'auto', exlabel:'🤖 AI全自动',
+   ins:['物料用量清单 ← NODE-06','选型结果（单价）← NODE-05','物料损耗率 ← NODE-08'],
+   outs:['物料成本汇总 → RC']},
+
+  {id:'n12', nid:'NODE-12', type:'auto',  name:'转化成本', cx:510,cy:1110, w:NW,h:NH, badge:'🤖',
+   def:'计算加工制造成本：Σ（工序时间 × 费率）+ 报废/返工损耗',
+   exec:'auto', exlabel:'🤖 AI全自动',
+   ins:['工艺路线表（标准时间+损耗率）← NODE-08','人工费率 ← B1','机器费率 ← B1','Overhead Rate ← B1'],
+   outs:['转化成本汇总 → RC'],
+   risk:'费率数据库为空时全部标S4标准假设'},
+
+  {id:'n13', nid:'NODE-13', type:'mixed', name:'生产能力物理载体', cx:870,cy:1110, w:NW,h:NH, badge:'🤝',
+   def:'估算模具工装/通用设备/专用设备/并行设备/专用检具的SOP前投入（五类拆分）',
+   exec:'mixed', exlabel:'🤝 AI估算 + 工程师确认',
+   ins:['并行设备需求+工作中心类型 ← NODE-08','专用检具需求 ← NODE-10','几何参数表 ← NODE-03','历史工装数据 ← B1'],
+   outs:['产能投入估算（五类分项）→ NRC']},
+
+  {id:'n14', nid:'NODE-14', type:'mixed', name:'项目计划', cx:1220,cy:1110, w:NW,h:NH, badge:'🤝', risk:true,
+   def:'基于SOP日期和平台计算的项目难度，建立TKO/VP/PS/SOP里程碑计划',
+   exec:'mixed', exlabel:'🤝 AI框架 + 项目经理确认',
+   ins:['SOP日期+里程碑要求 ← NODE-01','平台实时计算难度等级'],
+   outs:['里程碑计划 → ED&D'],
+   risk:'硬性阻断：SOP日期未提供，整个ED&D时间线无法建立'},
+
+  {id:'n15', nid:'NODE-15', type:'mixed', name:'ED&D 工程开发费', cx:1040,cy:1290, w:NW,h:NH, badge:'🤝',
+   def:'估算从现在到SOP的全部工程投入：工程工时费用 + DVP测试费用 + 样件费用 + 杂项',
+   exec:'mixed', exlabel:'🤝 AI估算 + 项目经理确认',
+   ins:['里程碑计划 ← NODE-14','DV+PV测试计划 ← NODE-09','工程人工费率 ← B1','样件费用系数 ← B1','测试设备费率 ← B1'],
+   outs:['ED&D费用估算（工时+测试分项）→ NRC'],
+   risk:'SOP日期+费率均缺失时，估算完全依赖S4标准假设'},
+
+  {id:'n16', nid:'NODE-16', type:'auto',  name:'RC 单件成本', cx:360,cy:1450, w:NW,h:NH, badge:'🤖',
+   def:'汇总单件可重复成本：RC = 物料成本 + 转化成本（含Overhead）',
+   exec:'auto', exlabel:'🤖 AI全自动',
+   ins:['物料成本汇总 ← NODE-11','转化成本汇总 ← NODE-12'],
+   outs:['RC汇总 → 报价']},
+
+  {id:'n17', nid:'NODE-17', type:'auto',  name:'NRC 总开发投入', cx:920,cy:1450, w:NW,h:NH, badge:'🤖',
+   def:'汇总SOP前一次性总投入：NRC = 生产能力物理载体 + ED&D + 新增基础设施',
+   exec:'auto', exlabel:'🤖 AI全自动',
+   ins:['产能投入估算 ← NODE-13','ED&D费用估算 ← NODE-15'],
+   outs:['NRC汇总 → 报价']},
+
+  {id:'n18', nid:'NODE-18', type:'human', name:'报价', cx:640,cy:1610, w:NW,h:NH, badge:'👤',
+   def:'汇总成本，生成完整报价包（RC+NRC+报价条件），负责人最终决策并提交Stellantis',
+   exec:'human', exlabel:'👤 人工决策',
+   ins:['RC汇总 ← NODE-16','NRC汇总 ← NODE-17','信息缺口清单 ← NODE-01','全程推导偏差记录'],
+   outs:['报价文件 → 提交客户','报价条件说明（偏差清单+缺口清单+主动约束）']},
+];
+
+const EDGES=[
+  {f:'ext-rfq',t:'n01',type:'normal'},
+  {f:'ext-reg',t:'n01',type:'normal'},
+  {f:'n01',t:'n09',type:'secondary'},
+  {f:'n01',t:'n14',type:'secondary'},
+  {f:'n01',t:'n18',type:'secondary'},
+  {f:'n01',t:'n02',type:'main'},
+  {f:'n02',t:'n03',type:'main'},
+  {f:'ext-3d',t:'n03',type:'risk'},
+  {f:'n02',t:'n07',type:'normal'},
+  {f:'n02',t:'n09',type:'normal'},
+  {f:'n03',t:'n04',type:'normal'},
+  {f:'n03',t:'n05',type:'normal'},
+  {f:'n03',t:'n06',type:'normal'},
+  {f:'n03',t:'n07',type:'normal'},
+  {f:'n03',t:'n08',type:'normal'},
+  {f:'n04',t:'n05',type:'secondary'},
+  {f:'n04',t:'n06',type:'secondary'},
+  {f:'n04',t:'n10',type:'secondary'},
+  {f:'n05',t:'n11',type:'normal'},
+  {f:'n06',t:'n11',type:'normal'},
+  {f:'n07',t:'n09',type:'normal'},
+  {f:'n07',t:'n08',type:'secondary'},
+  {f:'n07',t:'n02',type:'feedback'},
+  {f:'n08',t:'n10',type:'normal'},
+  {f:'n08',t:'n11',type:'secondary'},
+  {f:'n08',t:'n12',type:'normal'},
+  {f:'n08',t:'n13',type:'normal'},
+  {f:'n09',t:'n15',type:'normal'},
+  {f:'n10',t:'n13',type:'normal'},
+  {f:'n11',t:'n16',type:'normal'},
+  {f:'n12',t:'n16',type:'normal'},
+  {f:'n13',t:'n17',type:'normal'},
+  {f:'n14',t:'n15',type:'normal'},
+  {f:'n15',t:'n17',type:'normal'},
+  {f:'n16',t:'n18',type:'normal'},
+  {f:'n17',t:'n18',type:'normal'},
+  {f:'ext-b1',t:'n03',type:'b1'},
+  {f:'ext-b1',t:'n05',type:'b1'},
+  {f:'ext-b1',t:'n08',type:'b1'},
+  {f:'ext-b1',t:'n12',type:'b1'},
+  {f:'ext-b1',t:'n13',type:'b1'},
+  {f:'ext-b1',t:'n14',type:'b1'},
+  {f:'ext-b1',t:'n15',type:'b1'},
+];
+
+// ─── HELPERS ───────────────────────────────────────
+const nMap={};
+NODES.forEach(n=>nMap[n.id]=n);
+
+function pt(n, dir){
+  const hw=(n.w||NW)/2, hh=(n.h||NH)/2;
+  if(dir==='b') return {x:n.cx, y:n.cy+hh};
+  if(dir==='t') return {x:n.cx, y:n.cy-hh};
+  if(dir==='l') return {x:n.cx-hw, y:n.cy};
+  if(dir==='r') return {x:n.cx+hw, y:n.cy};
+}
+
+function bezier(x1,y1,x2,y2,cx1,cy1,cx2,cy2){
+  if(cx1===undefined){
+    const dy=y2-y1, k=Math.abs(dy)*.45;
+    cx1=x1; cy1=y1+k; cx2=x2; cy2=y2-k;
+  }
+  return `M${x1} ${y1} C${cx1} ${cy1},${cx2} ${cy2},${x2} ${y2}`;
+}
+
+function edgePath(e){
+  const S=nMap[e.f], T=nMap[e.t];
+  const shw=(S.w||NW)/2, shh=(S.h||NH)/2;
+  const thw=(T.w||NW)/2, thh=(T.h||NH)/2;
+
+  if(e.type==='feedback'){
+    const sx=S.cx+shw, sy=S.cy;
+    const ex=T.cx+thw, ey=T.cy+thh;
+    return `M${sx} ${sy} C${sx+100} ${sy},${ex+100} ${ey},${ex} ${ey}`;
+  }
+  if(e.type==='b1'){
+    const sx=S.cx-shw, sy=S.cy;
+    const ex=T.cx+thw, ey=T.cy;
+    const midX=Math.max(sx,ex)+40;
+    return `M${sx} ${sy} C${midX} ${sy},${midX} ${ey},${ex} ${ey}`;
+  }
+  if(e.type==='risk'){
+    const s=pt(S,'b'), t=pt(T,'t');
+    return bezier(s.x,s.y,t.x,t.y);
+  }
+  if(Math.abs(S.cy-T.cy)<80 && S.id!==T.id){
+    const sx=S.cx+shw, sy=S.cy;
+    const ex=T.cx-thw, ey=T.cy;
+    const arcY=Math.min(S.cy,T.cy)-28;
+    return `M${sx} ${sy} C${sx+30} ${sy},${sx+30} ${arcY},${(sx+ex)/2} ${arcY} S${ex-30} ${ey},${ex} ${ey}`;
+  }
+  const s=pt(S,'b'), t=pt(T,'t');
+  return bezier(s.x,s.y,t.x,t.y);
+}
+
+// ─── RENDER SVG ────────────────────────────────────
+function renderSVG(){
+  const svg=document.getElementById('svg');
+  const defs=`
+  <defs>
+    <marker id="arr-main" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0,8 3,0 6" fill="rgba(0,200,255,.7)"/>
+    </marker>
+    <marker id="arr-norm" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0,7 2.5,0 5" fill="rgba(0,200,255,.4)"/>
+    </marker>
+    <marker id="arr-sec" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto">
+      <polygon points="0 0,6 2,0 4" fill="rgba(0,180,255,.25)"/>
+    </marker>
+    <marker id="arr-feed" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0,7 2.5,0 5" fill="rgba(255,170,0,.6)"/>
+    </marker>
+    <marker id="arr-risk" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0,7 2.5,0 5" fill="rgba(255,51,85,.7)"/>
+    </marker>
+    <marker id="arr-b1" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto">
+      <polygon points="0 0,6 2,0 4" fill="rgba(153,102,255,.35)"/>
+    </marker>
+    <filter id="glow-blue">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-main">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>`;
+
+  const edgeStyles={
+    main:    {stroke:'rgba(0,200,255,.75)',width:1.8,dash:'none',marker:'arr-main',filter:'glow-main'},
+    normal:  {stroke:'rgba(0,200,255,.42)',width:1.2,dash:'none',marker:'arr-norm',filter:''},
+    secondary:{stroke:'rgba(0,180,255,.22)',width:.9,dash:'4,4',marker:'arr-sec',filter:''},
+    risk:    {stroke:'rgba(255,51,85,.7)', width:1.6,dash:'none',marker:'arr-risk',filter:'glow-blue'},
+    feedback:{stroke:'rgba(255,170,0,.65)',width:1.2,dash:'5,3',marker:'arr-feed',filter:''},
+    b1:      {stroke:'rgba(153,102,255,.3)',width:.8,dash:'3,5',marker:'arr-b1',filter:''},
+  };
+
+  let paths='';
+  EDGES.forEach(e=>{
+    const s=edgeStyles[e.type]||edgeStyles.normal;
+    const d=edgePath(e);
+    const fi=s.filter?`filter="url(#${s.filter})"` :'';
+    paths+=`<path class="epath" data-from="${e.f}" data-to="${e.t}" data-type="${e.type}" `+
+           `d="${d}" fill="none" stroke="${s.stroke}" stroke-width="${s.width}" `+
+           `stroke-dasharray="${s.dash}" marker-end="url(#${s.marker})" ${fi}/>`;
+  });
+
+  svg.innerHTML=defs+paths;
+}
+
+// ─── RENDER NODES ─────────────────────────────────
+function renderNodes(){
+  const layer=document.getElementById('nlayer');
+  layer.innerHTML='';
+  NODES.forEach(n=>{
+    const cls=['nd', n.type==='ext'?'ext':(n.type||'mixed')].join(' ');
+    const w=n.w||NW, h=n.h||NH;
+    let inner=``;
+    if(n.nid) inner+=`<div class="nd-id">${n.nid}</div>`;
+    inner+=`<div class="nd-name">${n.name}</div>`;
+    if(n.sub) inner+=`<div style="font-size:9.5px;color:var(--muted);margin-top:2px">${n.sub}</div>`;
+    inner+=`<div class="nd-badge">${n.badge||''}</div>`;
+    if(n.risk===true) inner+=`<div class="nd-risk">!</div>`;
+
+    const div=document.createElement('div');
+    div.className=cls;
+    div.style.left=n.cx+'px';
+    div.style.top=n.cy+'px';
+    div.style.width=w+'px';
+    div.innerHTML=inner;
+    div.dataset.nodeid=n.id;
+    div.addEventListener('mouseenter',()=>{ showNodeDetail(n); highlightArtifacts(n.id); highlightNetwork(n.id); });
+    div.addEventListener('mouseleave',()=>{ clearNodeDetail(); clearArtifactHighlight(); clearNetworkHighlight(); });
+    layer.appendChild(div);
+  });
+}
+
+// ─── NETWORK HIGHLIGHT ────────────────────────────
+const neighborMap={};
+function buildNeighborMap(){
+  NODES.forEach(n=>{ neighborMap[n.id]=new Set(); });
+  EDGES.forEach(e=>{
+    if(neighborMap[e.f]) neighborMap[e.f].add(e.t);
+    if(neighborMap[e.t]) neighborMap[e.t].add(e.f);
+  });
+}
+
+// Bright stroke colors for highlighted edges
+const hlStroke={
+  main:    'rgba(0,220,255,1)',
+  normal:  'rgba(0,200,255,.85)',
+  secondary:'rgba(0,180,255,.65)',
+  risk:    'rgba(255,51,85,1)',
+  feedback:'rgba(255,180,0,.9)',
+  b1:      'rgba(180,120,255,.75)',
+};
+const dimOpacity=0.04;
+
+function highlightNetwork(nodeId){
+  const neighbors=neighborMap[nodeId]||new Set();
+
+  // Nodes
+  document.querySelectorAll('.nd').forEach(el=>{
+    const id=el.dataset.nodeid;
+    if(!id) return;
+    el.classList.remove('nd-dim','nd-rel');
+    if(id===nodeId) { /* hovered — CSS :hover handles it */ }
+    else if(neighbors.has(id)) el.classList.add('nd-rel');
+    else el.classList.add('nd-dim');
+  });
+
+  // Edges
+  document.querySelectorAll('.epath').forEach(path=>{
+    const f=path.dataset.from, t=path.dataset.to, tp=path.dataset.type;
+    const connected=(f===nodeId||t===nodeId);
+    if(connected){
+      path.style.opacity='1';
+      path.style.stroke=hlStroke[tp]||hlStroke.normal;
+      path.style.strokeWidth=(tp==='main'?'2.4':tp==='risk'?'2':'1.6');
+      path.style.filter=tp==='main'||tp==='risk'?'url(#glow-main)':'';
+    } else {
+      path.style.opacity=String(dimOpacity);
+      path.style.stroke='';
+      path.style.strokeWidth='';
+      path.style.filter='';
+    }
+  });
+}
+
+function clearNetworkHighlight(){
+  document.querySelectorAll('.nd').forEach(el=>{
+    el.classList.remove('nd-dim','nd-rel');
+  });
+  document.querySelectorAll('.epath').forEach(path=>{
+    path.style.opacity='';
+    path.style.stroke='';
+    path.style.strokeWidth='';
+    path.style.filter='';
+  });
+}
+
+// ─── ARTIFACT PANEL ───────────────────────────────
+function parseArtifact(raw){
+  // Split "制品名 → 去向" for styled display
+  const arrow='→';
+  const idx=raw.indexOf(arrow);
+  if(idx===-1) return {name:raw, dest:''};
+  return {name:raw.slice(0,idx).trim(), dest:raw.slice(idx+arrow.length).trim()};
+}
+
+function renderArtifactPanel(){
+  const body=document.getElementById('sb-idle-body');
+  body.innerHTML='';
+
+  NODES.forEach(n=>{
+    if(!n.outs || n.outs.length===0) return;
+
+    const group=document.createElement('div');
+    group.className='ap-group';
+    group.dataset.nodeid=n.id;
+    group.dataset.type=n.type||'mixed';
+
+    // Group label
+    const label=document.createElement('div');
+    label.className='ap-group-label';
+    const nidStr=n.nid?`<span class="gnid">${n.nid}</span> `:
+                       `<span class="gnid">${n.id.toUpperCase()}</span> `;
+    label.innerHTML=`${nidStr}<span class="gname">${n.name}</span><span class="gbadge" style="margin-left:auto">${n.badge||''}</span>`;
+    group.appendChild(label);
+
+    // Artifact items
+    n.outs.forEach(raw=>{
+      const {name,dest}=parseArtifact(raw);
+      const item=document.createElement('div');
+      item.className='ap-item';
+      item.dataset.nodeid=n.id;
+      let html=`<span class="art-name">${name}</span>`;
+      if(dest) html+=` <span class="art-arrow">→</span><span class="art-dest">${dest}</span>`;
+      item.innerHTML=html;
+      group.appendChild(item);
+    });
+
+    body.appendChild(group);
+  });
+}
+
+function highlightArtifacts(nodeId){
+  const allGroups=document.querySelectorAll('.ap-group');
+  const allItems=document.querySelectorAll('.ap-item');
+
+  allGroups.forEach(g=>{
+    if(g.dataset.nodeid===nodeId) g.classList.add('hl');
+    else g.classList.remove('hl');
+  });
+
+  allItems.forEach(item=>{
+    if(item.dataset.nodeid===nodeId){
+      item.classList.add('hl');
+      item.classList.remove('dim');
+    } else {
+      item.classList.add('dim');
+      item.classList.remove('hl');
+    }
+  });
+
+  // Scroll the panel to show the highlighted group
+  const hlGroup=document.querySelector(`.ap-group[data-nodeid="${nodeId}"]`);
+  if(hlGroup){
+    hlGroup.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+}
+
+function clearArtifactHighlight(){
+  document.querySelectorAll('.ap-group').forEach(g=>g.classList.remove('hl'));
+  document.querySelectorAll('.ap-item').forEach(item=>{
+    item.classList.remove('hl','dim');
+  });
+}
+
+// ─── SIDEBAR ──────────────────────────────────────
+const sidebar   = document.getElementById('sidebar');
+const sbActive  = document.getElementById('sb-active');
+const typeColor = {auto:'var(--auto)',mixed:'var(--mixed)',human:'var(--human)',ext:'var(--ext)'};
+
+function showNodeDetail(n){
+  const t = n.type||'mixed';
+  sidebar.className = `type-${t} active`;
+  let html = '';
+  if(n.nid) html += `<div class="sa-nid" style="color:${typeColor[t]}">${n.nid}</div>`;
+  html += `<span class="sa-badge">${n.badge||''}</span>`;
+  html += `<div class="sa-name">${n.name}</div>`;
+  html += `<div class="sa-def">${n.def}</div>`;
+  if(n.exec) html += `<div class="sa-exec ${n.exec}">${n.exlabel}</div>`;
+  if(n.ins && n.ins.length){
+    html += `<div class="sa-lbl">输入</div><div class="sa-rows">`;
+    n.ins.forEach(i=>{ html+=`<div class="sa-row">${i}</div>`; });
+    html += `</div>`;
+  }
+  if(n.outs && n.outs.length){
+    html += `<div class="sa-divider"></div>`;
+    html += `<div class="sa-lbl">输出</div><div class="sa-rows">`;
+    n.outs.forEach(o=>{ html+=`<div class="sa-row">${o}</div>`; });
+    html += `</div>`;
+  }
+  if(n.risk && n.risk!==true){
+    html += `<div class="sa-risk">${n.risk}</div>`;
+  }
+  sbActive.innerHTML = html;
+}
+
+function clearNodeDetail(){
+  sidebar.className = '';
+  sbActive.innerHTML = '';
+}
+
+// ─── INIT ─────────────────────────────────────────
+buildNeighborMap();
+renderSVG();
+renderNodes();
+renderArtifactPanel();
+</script>
+</body>
+</html>

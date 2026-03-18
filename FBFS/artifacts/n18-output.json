@@ -1,0 +1,200 @@
+{
+  "node": "n18",
+  "project": "FBFS",
+  "status": "waiting_human",
+  "produced_at": "2026-03-18T10:26:34.567968+00:00",
+  "confidence_floor": "S4",
+  "gaps": [
+    {
+      "rule": "R-18-01",
+      "msg": "1 upstream error gap(s) — quotation cannot be finalized until resolved",
+      "severity": "error"
+    },
+    {
+      "rule": "R-18-02",
+      "msg": "7 upstream warnings — quotation confidence is limited; review assumptions",
+      "severity": "warning"
+    },
+    {
+      "rule": "R-18-03",
+      "msg": "Overall confidence floor is S4 — quotation contains significant assumptions",
+      "severity": "warning",
+      "assumption": "Confidence limited by: n01=S4,n16=S4,n17=S4,n11=S4,n12=S4,n13=S4,n15=S4"
+    }
+  ],
+  "assumptions": [],
+  "payload": {
+    "quotation_summary": {
+      "part_number": "FC00SAA78530",
+      "part_name": "Fuel supply line — diesel filter to engine",
+      "customer": "Stellantis",
+      "program": "STELLANTIS KP1 A&B",
+      "unit_price_eur": 41.8738,
+      "nrc_total_eur": 1679550,
+      "annual_volume": 50000,
+      "annual_revenue_eur": 2093690.0,
+      "sop_date": null
+    },
+    "price_breakdown": {
+      "rc": {
+        "material_cost_eur": 26.9643,
+        "conversion_cost_eur": 8.1785,
+        "logistics_eur": 1.7571,
+        "quality_cost_eur": 1.0543,
+        "overhead_eur": 0.8178,
+        "profit_eur": 3.1018,
+        "total_rc_eur": 41.8738
+      },
+      "nrc": {
+        "edd_total_eur": 1679550,
+        "tooling_investment_eur": 0,
+        "additional_capex_eur": 0,
+        "total_nrc_eur": 1679550,
+        "amortization_plan": {
+          "amortization_years": 5,
+          "amortization_years_confidence": "S4",
+          "annual_volume": 50000,
+          "total_pieces": 250000,
+          "nrc_per_piece_eur": 6.7182,
+          "nrc_per_year_eur": 335910.0
+        }
+      }
+    },
+    "confidence_summary": {
+      "n01": "S4",
+      "n16": "S4",
+      "n17": "S4",
+      "n11": "S4",
+      "n12": "S4",
+      "n13": "S4",
+      "n15": "S4"
+    },
+    "inherited_gaps": [
+      {
+        "source_node": "n01",
+        "rule": "R-01-01",
+        "msg": "annual_volume 未在任何文档中说明",
+        "severity": "warning"
+      },
+      {
+        "source_node": "n01",
+        "rule": "R-01-02",
+        "msg": "sop_date 未在任何文档中说明",
+        "severity": "warning"
+      },
+      {
+        "source_node": "n01",
+        "rule": "R-01-04",
+        "msg": "3D model 不可用 (OLE链接指向外部文件无法恢复)",
+        "severity": "info"
+      },
+      {
+        "source_node": "n01",
+        "rule": "R-01-07",
+        "msg": "tko_date / rfq_response_date 未在文档中找到",
+        "severity": "warning"
+      },
+      {
+        "source_node": "n01",
+        "rule": "R-01-03",
+        "msg": "61 个引用标准未提供于 inputs/: PF.90092, CD.80064, CS.00251, CS-11000, CS.00050, CS.00265, CS.CCP-ROUTING, LP.7A004, LP.7A005, MS.90025/06...",
+        "severity": "error"
+      },
+      {
+        "source_node": "n16",
+        "rule": "R-16-01",
+        "msg": "Logistics (5%), quality (3%), overhead (10%), profit (8%) are S4 assumptions — confirm with controlling",
+        "severity": "warning"
+      },
+      {
+        "source_node": "n17",
+        "rule": "R-17-01",
+        "msg": "NRC total (1679550 EUR) based on upstream estimates — confirm tooling quotes and EDD budget",
+        "severity": "warning"
+      },
+      {
+        "source_node": "n12",
+        "rule": "R-12-01",
+        "msg": "Labor rate 30.0 EUR/hr is assumption — no project-specific data",
+        "severity": "warning"
+      },
+      {
+        "source_node": "n12",
+        "rule": "R-12-02",
+        "msg": "Equipment investment values from n08 are estimates (3 operations)",
+        "severity": "info"
+      },
+      {
+        "source_node": "n15",
+        "rule": "R-15-01",
+        "msg": "SOP date unknown (not in n14) — project management cost uses assumed timeline",
+        "severity": "warning"
+      }
+    ],
+    "inherited_assumptions_count": 27,
+    "deliverables_status": [
+      {
+        "deliverable": "Co-Design Cost Breakdown (ED&D PBD)",
+        "status": "review_required"
+      },
+      {
+        "deliverable": "Component Development Sheet (CDS)",
+        "status": "review_required"
+      },
+      {
+        "deliverable": "3D Model (UG .prt / TCAE / Parasolid)",
+        "status": "review_required"
+      },
+      {
+        "deliverable": "Supplier Development Team (SDT)",
+        "status": "review_required"
+      },
+      {
+        "deliverable": "List of Exception (Deviation List)",
+        "status": "review_required"
+      },
+      {
+        "deliverable": "RASI Chart",
+        "status": "review_required"
+      },
+      {
+        "deliverable": "Additional Material List (DV/PV test materials)",
+        "status": "review_required"
+      },
+      {
+        "deliverable": "DVP&R Plan (DV+PV)",
+        "status": "review_required"
+      },
+      {
+        "deliverable": "Virtual Analysis",
+        "status": "review_required"
+      },
+      {
+        "deliverable": "Product and Process FMEA",
+        "status": "review_required"
+      },
+      {
+        "deliverable": "Complete 2D Drawings",
+        "status": "review_required"
+      },
+      {
+        "deliverable": "IMDS Material Data Sheet",
+        "status": "review_required"
+      },
+      {
+        "deliverable": "Best Practices Sharing",
+        "status": "review_required"
+      },
+      {
+        "deliverable": "Support SOP at Assembly Plant",
+        "status": "review_required"
+      }
+    ],
+    "open_items_for_customer": [
+      "1 upstream error gap(s) must be resolved before final quotation",
+      "[n01] R-01-03: 61 个引用标准未提供于 inputs/: PF.90092, CD.80064, CS.00251, CS-11000, CS.00050, CS.00265, CS.CCP-ROUTING, LP.7A004, LP.7A005, MS.90025/06...",
+      "Annual volume not confirmed by customer — affects unit price amortization",
+      "SOP date not confirmed — affects project timeline and EDD costs"
+    ]
+  }
+}
