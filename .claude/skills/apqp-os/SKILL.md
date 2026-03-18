@@ -69,7 +69,7 @@ For every ready node (applies to Build and Optimize; Review skips steps 4–7):
 5. **Write artifact** — use store.py (see below)
 6. **Close log** — call `log.done(artifact)` after writing artifact
 7. **Write report** — call `NodeReport.write(artifact)` and `print_summary(artifact)` (see below)
-8. **Generate deliverables** — if this node is `filled_by_node` for any n01 deliverable, fill the template (see guide-template.md § Deliverable Generation)
+8. **Generate deliverables (mandatory check)** — after EVERY node, check n01 `deliverables_required` for entries where `filled_by_node` matches this node AND `phase` matches `project.json.current_phase`. If found: read the customer template (or generate standard format), fill with this node's artifact data, save to `artifacts/deliverables/D-XX-name.xlsx`, update n01's `output_file` field. See guide-template.md § Deliverable Generation for full logic. **This step applies even if the node guide does not mention it.**
 9. **Validate** — run the validation snippet from the guide
 
 ### Execution Logging
@@ -119,45 +119,13 @@ See `references/artifact-schema.md` for the full envelope spec.
 
 ### Writing the Completion Report
 
-Every node must generate a human-readable completion report. Call immediately after `log.done()`:
-
 ```python
-import sys
-sys.path.insert(0, '/home/chu2026/Documents/APQPOS/.claude/skills/apqp-os/scripts')
 from reporter import NodeReport
-
-# AI 根据本次实际执行情况填写，不可省略
-execution_summary = """
-### 读取的文件
-
-| 层级 | 文件 | 内容 |
-|------|------|------|
-| L0 | `<filename>` | <角色描述> |
-...
-
-### 过程中解决的问题
-
-- <问题>: <原因> → <解决方案>
-- 无异常（如无问题则写此行）
-
-### 假设与判断
-
-- <字段>: <理由>（置信度 Sx）
-- 无（如无则写此行）
-
-### 对 skill 的改进
-
-- <修改内容>
-- 无（如无则写此行）
-"""
-
+# execution_summary 必须包含四个小节：读取的文件、过程中解决的问题、假设与判断、对 skill 的改进
 report = NodeReport('<project_path>', 'nXX')
 report.write(artifact, execution_summary=execution_summary)
 report.print_summary(artifact)
-# → 报告写入 reports/nXX-report-YYYYMMDD-HHMMSS.md
 ```
-
-`execution_summary` 四个小节必须全部填写（无内容写"无"）。报告还自动包含从 artifact 提取的：制品概览、几何参数、特殊特性、性能需求、测试矩阵、标准清单、交付物、缺口、下一步节点。
 
 ## Node Reference Files
 
