@@ -1,7 +1,3 @@
 __pycache__/
 *.pyc
-FBFS/artifacts/_embedded/
-FBFS/inputs/
-FBFS/benchmark/
-FBFS/benchmark2/
-FBFS/benchmark3/
+FBFS/
