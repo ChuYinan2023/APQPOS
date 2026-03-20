@@ -621,7 +621,7 @@ class DataflowDiagram:
         for it in top:
             s_cls = it["confidence"].lower()
             badge_label = f'{it["confidence"]} {"推测" if it["confidence"]=="S4" else "经验"}'
-            val_display = it["value"]
+            val_display = str(it["value"])
             if it["unit"]:
                 val_display += f' {it["unit"]}'
             cards.append(
@@ -706,7 +706,7 @@ class DataflowDiagram:
             details[nid] = {
                 "status": art.get("status", "pending"),
                 "confidence_floor": art.get("confidence_floor"),
-                "payload": self._trim_payload(art.get("payload", {}), max_list=2, max_depth=1),
+                "payload": self._trim_payload(art.get("payload", {}), max_list=3, max_depth=2),
                 "gaps": art.get("gaps", []),
                 "assumptions": art.get("assumptions", []),
             }
@@ -1038,16 +1038,25 @@ class DataflowDiagram:
     margin-bottom: 10px;
   }
 
-  .drawer-table { width: 100%; font-size: 12px; border-collapse: collapse; }
+  .drawer-table { width: 100%; font-size: 12px; border-collapse: collapse; table-layout: fixed; }
   .drawer-table td {
-    padding: 4px 8px; border-bottom: 1px solid rgba(30,45,74,0.5);
-    vertical-align: top;
+    padding: 5px 8px; border-bottom: 1px solid rgba(30,45,74,0.5);
+    vertical-align: top; overflow: hidden; text-overflow: ellipsis;
   }
   .drawer-table td:first-child {
-    color: var(--text-dim); white-space: nowrap; width: 40%;
+    color: var(--text-dim); width: 130px;
     font-family: 'Cascadia Code', monospace; font-size: 11px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
-  .drawer-table td:last-child { color: var(--text-secondary); word-break: break-word; }
+  .drawer-table td:last-child {
+    color: var(--text-secondary); overflow-wrap: break-word; word-break: break-word;
+  }
+  .drawer-table .nested-label {
+    color: var(--accent-blue); font-size: 11px; font-weight: 600;
+    cursor: pointer; user-select: none;
+  }
+  .drawer-table .nested-label:hover { color: var(--accent-cyan); }
+  .drawer-table .nested-content { padding-left: 4px; }
 
   .drawer-gap {
     padding: 8px 12px; margin-bottom: 6px; border-radius: 6px;
@@ -1143,24 +1152,53 @@ function esc(s) {
 }
 
 function renderTable(obj, depth) {
-  if (obj === null || obj === undefined) return '<span style="color:var(--text-dim)">null</span>';
-  if (typeof obj !== 'object') return esc(String(obj));
+  if (obj === null || obj === undefined) return '<span style="color:var(--text-dim)">—</span>';
+  if (typeof obj !== 'object') {
+    var s = String(obj);
+    if (s.length > 80) s = s.substring(0, 77) + '...';
+    return esc(s);
+  }
   if (Array.isArray(obj)) {
     if (obj.length === 0) return '<span style="color:var(--text-dim)">[]</span>';
-    if (obj.length > 10) {
-      return '<span style="color:var(--text-dim)">[' + obj.length + ' items]</span>';
+    if (typeof obj[0] !== 'object') {
+      var joined = obj.map(v => String(v)).join(', ');
+      if (joined.length > 80) joined = joined.substring(0, 77) + '...';
+      return esc(joined);
     }
-    if (typeof obj[0] !== 'object') return esc(obj.join(', '));
-    return '<table class="drawer-table">' +
-      obj.map((item, i) => '<tr><td>#' + (i+1) + '</td><td>' + renderTable(item, depth+1) + '</td></tr>').join('') +
-      '</table>';
+    return '<span style="color:var(--text-dim)">[' + obj.length + ' items]</span>';
   }
-  const keys = Object.keys(obj);
+  var keys = Object.keys(obj);
   if (keys.length === 0) return '<span style="color:var(--text-dim)">{}</span>';
-  if (depth > 2) return '<span style="color:var(--text-dim)">{' + keys.length + ' fields}</span>';
-  return '<table class="drawer-table">' +
-    keys.map(k => '<tr><td>' + esc(k) + '</td><td>' + renderTable(obj[k], depth+1) + '</td></tr>').join('') +
-    '</table>';
+  if (depth > 1) {
+    // Flatten nested object into key=value pairs inline
+    var parts = keys.slice(0, 6).map(function(k) {
+      var v = obj[k];
+      if (v === null || v === undefined) return '';
+      if (typeof v === 'object') return esc(k) + ': {...}';
+      var sv = String(v);
+      if (sv.length > 30) sv = sv.substring(0, 27) + '...';
+      return esc(k) + ': ' + esc(sv);
+    }).filter(Boolean);
+    if (keys.length > 6) parts.push('...');
+    return '<div style="line-height:1.6;font-size:11px">' + parts.join('<br>') + '</div>';
+  }
+  var rows = [];
+  keys.forEach(function(k) {
+    var v = obj[k];
+    if (v === null || v === undefined) return;
+    if (typeof v === 'object' && !Array.isArray(v)) {
+      // Nested object: render as collapsible section
+      var subKeys = Object.keys(v);
+      var uid = 'nest-' + Math.random().toString(36).substring(2,8);
+      rows.push('<tr><td colspan="2"><span class="nested-label" onclick="var el=document.getElementById(\\'' + uid + '\\');el.style.display=el.style.display===\\'none\\'?\\'block\\':\\'none\\'">' +
+        '▸ ' + esc(k) + ' (' + subKeys.length + ')</span>' +
+        '<div class="nested-content" id="' + uid + '" style="display:none;margin-top:4px">' +
+        renderTable(v, depth + 1) + '</div></td></tr>');
+    } else {
+      rows.push('<tr><td>' + esc(k) + '</td><td>' + renderTable(v, depth + 1) + '</td></tr>');
+    }
+  });
+  return '<table class="drawer-table">' + rows.join('') + '</table>';
 }
 
 // Event binding
