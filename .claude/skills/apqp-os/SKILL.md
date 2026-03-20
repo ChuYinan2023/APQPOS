@@ -69,8 +69,14 @@ For every ready node (applies to Build and Optimize; Review skips steps 4–7):
 5. **Write artifact** — use store.py (see below)
 6. **Close log** — call `log.done(artifact)` after writing artifact
 7. **Write report** — call `NodeReport.write(artifact)` and `print_summary(artifact)` (see below)
-8. **Generate deliverables (mandatory check)** — after EVERY node, check n01 `deliverables_required` for entries where `filled_by_node` matches this node AND `phase` matches `project.json.current_phase`. If found: read the customer template (or generate standard format), fill with this node's artifact data, save to `artifacts/deliverables/D-XX-name.xlsx`, update n01's `output_file` field. See guide-template.md § Deliverable Generation for full logic. **This step applies even if the node guide does not mention it.**
-9. **Validate** — run the validation snippet from the guide
+8. **Update dataflow diagram** — regenerate the interactive HTML visualization:
+```python
+from diagram import DataflowDiagram
+DataflowDiagram('<project_path>').generate()
+```
+This updates `artifacts/dataflow-diagram.html` with the latest node data. The diagram shows all 18 nodes progressively: completed nodes in color with real data, pending nodes in grey.
+9. **Generate deliverables (mandatory check)** — after EVERY node, check n01 `deliverables_required` for entries where `filled_by_node` matches this node AND `phase` matches `project.json.current_phase`. If found: read the customer template (or generate standard format), fill with this node's artifact data, save to `artifacts/deliverables/D-XX-name.xlsx`, update n01's `output_file` field. See guide-template.md § Deliverable Generation for full logic. **This step applies even if the node guide does not mention it.**
+10. **Validate** — run the validation snippet from the guide
 
 ### Execution Logging
 
@@ -206,3 +212,4 @@ Alert the user automatically when any of these conditions are detected:
 | 执行过程记录 | 执行日志 | `logs/nXX-YYYYMMDD-HHMMSS.md` |
 | artifact 数据摘要 | 人类可读报告 | `reports/nXX-report-YYYYMMDD-HHMMSS.md` |
 | extraction_matrix 检查 | 覆盖度报告 | `artifacts/nXX-extraction-coverage.json` (n01) |
+| 全部节点 artifact 数据 | 交互式数据流图 | `artifacts/dataflow-diagram.html` |
