@@ -14,7 +14,9 @@ import json, sys
 from pathlib import Path
 from datetime import datetime, timezone
 
-sys.path.insert(0, '/home/chu2026/Documents/APQPOS/.claude/skills/apqp-os/scripts')
+_APQPOS = next(p for p in [Path.cwd()] + list(Path.cwd().parents)
+               if (p / '.claude/skills/apqp-os/scripts').exists())
+sys.path.insert(0, str(_APQPOS / '.claude/skills/apqp-os/scripts'))
 from store import ArtifactStore
 from logger import NodeLogger
 

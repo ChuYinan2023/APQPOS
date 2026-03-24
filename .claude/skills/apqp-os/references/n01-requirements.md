@@ -13,7 +13,9 @@
 import json, sys
 from pathlib import Path
 
-sys.path.insert(0, '/home/chu2026/Documents/APQPOS/.claude/skills/apqp-os/scripts')
+_APQPOS = next(p for p in [Path.cwd()] + list(Path.cwd().parents)
+               if (p / '.claude/skills/apqp-os/scripts').exists())
+sys.path.insert(0, str(_APQPOS / '.claude/skills/apqp-os/scripts'))
 from logger import NodeLogger
 
 p = Path('<project_path>')
@@ -442,7 +444,9 @@ log.step("Step 4: Extract structured fields")
 
 # ── 在 Step 4 开始时初始化 ExtractionMatrix ──────────────────────────────
 import sys
-sys.path.insert(0, '/home/chu2026/Documents/APQPOS/.claude/skills/apqp-os/scripts')
+_APQPOS = next(p for p in [Path.cwd()] + list(Path.cwd().parents)
+               if (p / '.claude/skills/apqp-os/scripts').exists())
+sys.path.insert(0, str(_APQPOS / '.claude/skills/apqp-os/scripts'))
 from extraction_matrix import ExtractionMatrix
 
 matrix = ExtractionMatrix('<project_path>', 'n01')
@@ -782,7 +786,9 @@ if no_3d_model:
 
 ```python
 import sys
-sys.path.insert(0, '/home/chu2026/Documents/APQPOS/.claude/skills/apqp-os/scripts')
+_APQPOS = next(p for p in [Path.cwd()] + list(Path.cwd().parents)
+               if (p / '.claude/skills/apqp-os/scripts').exists())
+sys.path.insert(0, str(_APQPOS / '.claude/skills/apqp-os/scripts'))
 from reporter import NodeReport
 
 # 1. 文件完整性门控 — 有未读文件则抛出
@@ -839,7 +845,9 @@ report.print_summary(artifact)
 import json, sys
 from pathlib import Path
 
-sys.path.insert(0, '/home/chu2026/Documents/APQPOS/.claude/skills/apqp-os/scripts')
+_APQPOS = next(p for p in [Path.cwd()] + list(Path.cwd().parents)
+               if (p / '.claude/skills/apqp-os/scripts').exists())
+sys.path.insert(0, str(_APQPOS / '.claude/skills/apqp-os/scripts'))
 from store import ArtifactStore
 
 store = ArtifactStore('<project_path>')

@@ -121,7 +121,9 @@ spec_file = idx['main_performance_spec']       # → PF.90197.pdf
 ### Contract for the responsible node
 
 ```python
-INTERNAL_TEMPLATE_DIR = Path('/home/chu2026/Documents/APQPOS/.claude/skills/apqp-os/assets/templates')
+_APQPOS = next(p for p in [Path.cwd()] + list(Path.cwd().parents)
+               if (p / '.claude/skills/apqp-os/scripts').exists())
+INTERNAL_TEMPLATE_DIR = _APQPOS / '.claude/skills/apqp-os/assets/templates'
 
 d = n01['payload']['deliverables_required']  # find entry by id
 

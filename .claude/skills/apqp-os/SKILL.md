@@ -48,7 +48,7 @@ Skill infrastructure (read-only):
 - Node guides: `<APQPOS>/.claude/skills/apqp-os/references/nXX-*.md`
 - DAG definition: `<APQPOS>/.claude/skills/apqp-os/references/network.json`
 
-Where `<APQPOS>` = `/home/chu2026/Documents/APQPOS`
+Where `<APQPOS>` = auto-resolved at runtime (repo root containing `.claude/skills/apqp-os/`)
 
 ## Workflow Modes
 
@@ -84,7 +84,9 @@ Every node must log its execution for traceability. Log files are written to `<p
 
 ```python
 import sys
-sys.path.insert(0, '/home/chu2026/Documents/APQPOS/.claude/skills/apqp-os/scripts')
+_APQPOS = next(p for p in [Path.cwd()] + list(Path.cwd().parents)
+               if (p / '.claude/skills/apqp-os/scripts').exists())
+sys.path.insert(0, str(_APQPOS / '.claude/skills/apqp-os/scripts'))
 from logger import NodeLogger
 
 log = NodeLogger('<project_path>', 'nXX')   # creates logs/nXX-YYYYMMDD-HHMMSS.md
