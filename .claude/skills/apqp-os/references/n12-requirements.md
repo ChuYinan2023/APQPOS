@@ -82,40 +82,47 @@ The following rates are typically assumptions (S3/S4) unless the project provide
 
 | Parameter | Typical Range | Default Assumption | Confidence |
 |-----------|---------------|-------------------|------------|
-| `labor_rate_eur_hr` | 25-45 EUR/hr | 35 EUR/hr (Central Europe) | S4 |
-| `overhead_rate_pct` | 150-200% of direct labor | 175% | S4 |
+| `labor_rate_cny_hr` | 25-60 CNY/hr | 35 CNY/hr（中国制造业直接人工含社保） | S4 |
+| `overhead_rate_pct` | 150-250% of direct labor | 180% | S4 |
 | `depreciation_years` | 7-10 years | 8 years | S3 |
-| `annual_operating_hours` | 4000-6000 hr/yr | 5000 hr/yr (3-shift) | S3 |
+| `annual_operating_hours` | 3500-5000 hr/yr | 4000 hr/yr（两班制×8h×250工作日） | S3 |
+| `exchange_rate_cny_eur` | — | 0.13（≈7.7:1） | S4 |
 
 Check if n01 or project.json provides any of these values at higher confidence. If so, use those instead.
 
 ```python
-# Default assumptions — override with project-specific data if available
-labor_rate_eur_hr = 35.0        # S4 assumption
-overhead_rate_pct = 175.0       # S4 assumption (% of direct labor)
-depreciation_years = 8          # S3 assumption
-annual_hours = 5000             # S3 assumption (hours/year)
+# Default assumptions — 中国制造业基准（override with project-specific data if available）
+labor_rate_cny_hr   = 35.0      # S4 assumption（直接人工综合费率含社保公积金，CNY/hr）
+overhead_rate_pct   = 180.0     # S4 assumption（制造费用率 % of 直接人工，中国工厂典型值）
+depreciation_years  = 8         # S3 assumption（设备折旧年限）
+annual_hours        = 4000      # S3 assumption（两班制×8h×250工作日/年）
+exchange_rate_cny_eur = 0.13    # S4 assumption（1 CNY ≈ 0.13 EUR，参考汇率约7.7:1）
 
 assumptions = []
 assumptions.append({
-    "id": "A-12-01", "field": "labor_rate_eur_hr",
-    "value": labor_rate_eur_hr, "unit": "EUR/hr",
-    "confidence": "S4", "rationale": "Central Europe average, no project-specific data"
+    "id": "A-12-01", "field": "labor_rate_cny_hr",
+    "value": labor_rate_cny_hr, "unit": "CNY/hr",
+    "confidence": "S4", "rationale": "中国制造业直接人工综合费率（含社保公积金），无项目实测数据"
 })
 assumptions.append({
     "id": "A-12-02", "field": "overhead_rate_pct",
     "value": overhead_rate_pct, "unit": "%",
-    "confidence": "S4", "rationale": "Industry standard 150-200%, mid-range selected"
+    "confidence": "S4", "rationale": "中国工厂制造费用率 150-250%，取中值"
 })
 assumptions.append({
     "id": "A-12-03", "field": "depreciation_years",
     "value": depreciation_years, "unit": "years",
-    "confidence": "S3", "rationale": "Standard equipment depreciation period"
+    "confidence": "S3", "rationale": "标准设备折旧年限"
 })
 assumptions.append({
     "id": "A-12-04", "field": "annual_operating_hours",
     "value": annual_hours, "unit": "hr/yr",
-    "confidence": "S3", "rationale": "3-shift operation assumption"
+    "confidence": "S3", "rationale": "两班制×8h×250工作日/年"
+})
+assumptions.append({
+    "id": "A-12-05", "field": "exchange_rate_cny_eur",
+    "value": exchange_rate_cny_eur, "unit": "EUR/CNY",
+    "confidence": "S4", "rationale": "参考汇率约7.7:1，报价时按合同约定汇率调整"
 })
 log.info(f"Cost assumptions established: {len(assumptions)} items")
 ```
@@ -129,7 +136,8 @@ log.step("Step 3: Calculate conversion cost per operation")
 For each operation in n08:
 
 ```
-labor_cost_eur     = (cycle_time_sec / 3600) * operators * labor_rate_eur_hr
+labor_cost_cny     = (cycle_time_sec / 3600) * operators * labor_rate_cny_hr
+labor_cost_eur     = labor_cost_cny * exchange_rate_cny_eur
 equipment_cost_eur = investment_eur / (depreciation_years * annual_hours * 3600 / tact_time_sec)
 overhead_eur       = labor_cost_eur * (overhead_rate_pct / 100)
 total_eur          = labor_cost_eur + equipment_cost_eur + overhead_eur
@@ -150,7 +158,8 @@ for op in ops:
     invest = op.get('investment_eur', 0)
     tact = op.get('tact_time_sec') or n08['payload'].get('tact_time_sec', ct)
 
-    labor = (ct / 3600) * n_ops * labor_rate_eur_hr
+    labor_cny = (ct / 3600) * n_ops * labor_rate_cny_hr
+    labor = labor_cny * exchange_rate_cny_eur   # convert to EUR for OEM quote
     if invest > 0 and tact > 0:
         total_pieces_lifetime = depreciation_years * annual_hours * 3600 / tact
         equip = invest / total_pieces_lifetime
@@ -184,7 +193,7 @@ log.step("Step 4: Gap identification")
 
 | Gap | Rule | Severity | Assumption |
 |-----|------|----------|------------|
-| Labor rate is assumption (no project data) | R-12-01 | warning | labor_rate_eur_hr value (S4) |
+| Labor rate is assumption (no project data) | R-12-01 | warning | labor_rate_cny_hr value (S4) |
 | Investment is estimate (from n08 assumptions) | R-12-02 | info | investment values from n08 |
 
 ```python
@@ -193,9 +202,9 @@ gaps = []
 # R-12-01: labor rate is always an assumption unless customer provides it
 gaps.append({
     "rule": "R-12-01",
-    "msg": f"Labor rate {labor_rate_eur_hr} EUR/hr is assumption — no project-specific data",
+    "msg": f"Labor rate {labor_rate_cny_hr} CNY/hr is assumption — no project-specific data",
     "severity": "warning",
-    "assumption": f"{labor_rate_eur_hr} EUR/hr (S4)"
+    "assumption": f"{labor_rate_cny_hr} CNY/hr (S4)"
 })
 
 # R-12-02: check if n08 investment values are estimates
@@ -232,7 +241,8 @@ artifact = {
         "operations": cost_operations,
         "summary": {
             "total_conversion_cost_eur": round(total_conversion, 4),
-            "labor_rate_assumption": labor_rate_eur_hr,
+            "labor_rate_cny_hr": labor_rate_cny_hr,
+            "exchange_rate_cny_eur": exchange_rate_cny_eur,
             "overhead_rate_assumption": overhead_rate_pct,
             "depreciation_years": depreciation_years,
             "annual_operating_hours": annual_hours,
@@ -268,10 +278,11 @@ execution_summary = """
 
 ### 假设与判断
 
-- **labor_rate_eur_hr**: 35 EUR/hr — 中欧平均水平 (S4)
-- **overhead_rate_pct**: 175% — 行业标准范围中值 (S4)
+- **labor_rate_cny_hr**: 35 CNY/hr — 中国制造业直接人工含社保 (S4)
+- **overhead_rate_pct**: 180% — 中国工厂制造费用率中值 (S4)
 - **depreciation_years**: 8 年 — 标准设备折旧期 (S3)
-- **annual_operating_hours**: 5000 hr/yr — 三班制 (S3)
+- **annual_operating_hours**: 4000 hr/yr — 两班制×8h×250工作日 (S3)
+- **exchange_rate_cny_eur**: 0.13 — 参考汇率约7.7:1 (S4)
 
 ### 对 skill 的改进
 
@@ -365,7 +376,7 @@ for op in p['operations']:
 # 验证 summary
 s = p.get('summary', {})
 assert s.get('total_conversion_cost_eur') is not None, "summary.total_conversion_cost_eur missing"
-assert s.get('labor_rate_assumption'), "summary.labor_rate_assumption missing"
+assert s.get('labor_rate_cny_hr'), "summary.labor_rate_cny_hr missing"
 assert s.get('overhead_rate_assumption'), "summary.overhead_rate_assumption missing"
 assert s.get('depreciation_years'), "summary.depreciation_years missing"
 
@@ -382,7 +393,7 @@ for g in artifact.get('gaps', []):
 # 4. 检查必须存在的 gap
 gap_rules = [g['rule'] for g in artifact.get('gaps', [])]
 # R-12-01 should exist unless labor rate is project-confirmed
-has_labor_assumption = any(a['field'] == 'labor_rate_eur_hr' and a['confidence'] in ('S3','S4','S5')
+has_labor_assumption = any(a['field'] == 'labor_rate_cny_hr' and a['confidence'] in ('S3','S4','S5')
                            for a in artifact.get('assumptions', []))
 if has_labor_assumption:
     assert 'R-12-01' in gap_rules, "R-12-01 gap missing — labor rate is assumption but gap not flagged"

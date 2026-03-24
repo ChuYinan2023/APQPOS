@@ -271,7 +271,7 @@ log.step("Step 4: Add final operations and compute line summary")
 # total_investment_eur = sum of all operation investment_eur
 # annual_capacity_at_tact = floor(available_seconds_per_year / tact_time_sec)
 #   where available_seconds_per_year = shifts_per_day * hours_per_shift * 3600 * working_days
-#   Default assumption: 2 shifts × 7.5 h × 3600 × 235 days = 12,690,000 sec/year
+#   Default assumption: 2 shifts × 8 h × 3600 × 250 days = 14,400,000 sec/year（中国标准：两班制×8h×250工作日）
 #   (This is an assumption — record it.)
 
 bottleneck_op = max(operations, key=lambda op: op['cycle_time_sec'])
@@ -282,7 +282,7 @@ tact_time_sec = bottleneck_op['cycle_time_sec']
 total_operators = sum(op['operators'] for op in operations)
 total_investment_eur = sum(op['investment_eur'] for op in operations)
 
-AVAILABLE_SEC_PER_YEAR = 2 * 7.5 * 3600 * 235  # = 12,690,000
+AVAILABLE_SEC_PER_YEAR = 2 * 8.0 * 3600 * 250  # = 14,400,000（两班制×8h×250工作日）
 annual_capacity_at_tact = int(AVAILABLE_SEC_PER_YEAR // tact_time_sec) if tact_time_sec > 0 else 0
 
 log.info(f"Total operations        : {len(operations)}")
@@ -406,7 +406,7 @@ execution_summary = """
 ### 假设与判断
 
 - (AI fills: each cycle_time / investment / equipment assumption with confidence level)
-- Annual capacity assumes 2 shifts × 7.5h × 235 working days (S4 assumption)
+- Annual capacity assumes 2 shifts × 8h × 250 working days（中国标准）(S4 assumption)
 
 ### 对 skill 的改进
 

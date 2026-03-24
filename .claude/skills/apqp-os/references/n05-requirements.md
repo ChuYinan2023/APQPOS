@@ -169,7 +169,8 @@ for item in make_items:
         "grade": "",               # e.g. "Rilsan BESNO TL", "Viton A-401C"
         "supplier": "",            # e.g. "Arkema", "DuPont"
         "density_g_cm3": 0.0,
-        "unit_price_eur_kg": 0.0,  # estimate — confidence S3 or S4
+        "unit_price_cny_kg": 0.0,  # 国内市场价（CNY/kg）— confidence S3 or S4
+        "unit_price_eur_kg": 0.0,  # unit_price_cny_kg × exchange_rate_cny_eur（供 n11 使用）
         "elv_compliant": True,     # True / False / None (unknown)
         "reach_compliant": True,
         "oem_spec_ref": "",        # OEM material spec number if applicable
@@ -191,6 +192,68 @@ for item in make_items:
 ```
 
 ---
+
+### Step 2b: Buy item pricing — 1688.com 参考报价
+
+```python
+log.step("Step 2b: Buy item pricing — 1688 reference prices")
+```
+
+对 n04 BOM 中 `make_or_buy == "buy"` 的外购件，通过 1688.com 查询参考价格。
+
+**查询规则：**
+
+1. 从 n04 artifact 获取 buy 件列表：
+```python
+buy_items = [item for item in bom_items if item.get('make_or_buy') == 'buy']
+log.info(f"Buy items requiring pricing: {len(buy_items)}")
+```
+
+2. 对每个 buy 件，用以下关键词在 1688.com 搜索：
+   - `{part_name}` + `{material_hint}` + `汽车`（若有 OEM/规格信息则附加）
+   - 参考**中间价**（去掉最高/最低价异常值），记录典型批量价（1000件起）
+
+3. 汇率转换（与 n12 保持一致）：
+```python
+EXCHANGE_RATE_CNY_EUR = 0.13   # S4，参考汇率约7.7:1
+```
+
+4. 记录每个 buy 件的定价结果：
+```python
+buy_pricing = []
+for item in buy_items:
+    comp_ref = item.get('component_ref')
+    # AI: 在 1688.com 搜索该零件，记录参考价格
+    buy_price_cny = ...   # 从 1688 搜索结果读取，CNY/件
+    buy_price_eur = round(buy_price_cny * EXCHANGE_RATE_CNY_EUR, 4)
+
+    buy_pricing.append({
+        "component_ref":  comp_ref,
+        "part_name":      item.get('part_name', ''),
+        "make_or_buy":    "buy",
+        "buy_price_cny":  buy_price_cny,           # 1688 参考价（CNY/件）
+        "buy_price_eur":  buy_price_eur,            # 折算 EUR（供 n11 使用）
+        "price_source":   "1688_reference",         # 区别于 catalog（官方目录价）
+        "search_keyword": "",                       # 记录实际搜索关键词
+        "confidence":     "S4",                    # 市场询价，非正式报价
+        "needs_review":   True,                    # 必须通过正式采购确认
+        "unit_price_eur_kg": None,                 # buy 件不填，n11 用 buy_price_eur
+        "unit_price_cny_kg": None,
+    })
+    log.info(f"{comp_ref}: BUY — 1688参考价 {buy_price_cny} CNY ≈ {buy_price_eur} EUR")
+    log.warn(f"{comp_ref}: buy 件价格为 1688 参考价，需正式采购询价确认")
+```
+
+5. 将 `buy_pricing` 并入 `selections` 列表（n11 统一从 n05.selections 读取）：
+```python
+selections.extend(buy_pricing)
+unresolved_count += len(buy_pricing)   # 所有 buy 件都需要正式确认
+```
+
+**Gap 规则：**
+- 若某 buy 件在 1688.com 无法找到参考价 → `severity: warning`，`buy_price_cny: null`，标注原因
+- 所有 1688 参考价都标记 `needs_review: true`（正式报价阶段替换）
+
 
 ### Step 3: 置信度与假设管理
 
@@ -227,9 +290,9 @@ for sel in selections:
         "id": f"A-05-{sel['component_ref']}-price",
         "field": f"unit_price_eur_kg for {sel['component_ref']}",
         "value": str(sel['unit_price_eur_kg']),
-        "unit": "EUR/kg",
-        "confidence": "S4" if sel['unit_price_eur_kg'] > 0 else "S5",
-        "rationale": "Market estimate; confirm with supplier quotation"
+        "unit": "CNY/kg",
+        "confidence": "S4" if sel['unit_price_cny_kg'] > 0 else "S5",
+        "rationale": "国内市场估价（参考同类材料行情），需供应商正式报价确认"
     })
 ```
 
@@ -382,7 +445,8 @@ report.print_summary(artifact)
         "grade": "Rilsan BESNO TL",
         "supplier": "Arkema",
         "density_g_cm3": 1.02,
-        "unit_price_eur_kg": 8.5,
+        "unit_price_cny_kg": 65.5,
+        "unit_price_eur_kg": 8.52,
         "elv_compliant": true,
         "reach_compliant": true,
         "oem_spec_ref": "MS.50017",
