@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Q^AI 成本数据流图</title>
+<style>
+  :root {
+    --bg-primary: #0a0e17;
+    --bg-secondary: #111827;
+    --bg-card: #151d2e;
+    --bg-card-hover: #1a2540;
+    --border: #1e2d4a;
+    --border-glow: #2563eb;
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-dim: #4a5568;
+    --accent-blue: #3b82f6;
+    --accent-cyan: #06b6d4;
+    --accent-emerald: #10b981;
+    --accent-amber: #f59e0b;
+    --accent-red: #ef4444;
+    --accent-purple: #8b5cf6;
+    --accent-pink: #ec4899;
+    --s3-color: #f59e0b;
+    --s4-color: #ef4444;
+    --glow-blue: 0 0 20px rgba(59, 130, 246, 0.3);
+    --glow-cyan: 0 0 20px rgba(6, 182, 212, 0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Vignette */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page-wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 40px 32px 80px;
+  }
+
+  /* Header */
+  .header {
+    margin-bottom: 48px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Cascadia Code', 'Fira Code', 'SF Mono', 'Menlo', 'Consolas', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent-cyan);
+    background: rgba(6, 182, 212, 0.08);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+    padding: 6px 14px;
+    border-radius: 4px;
+    width: fit-content;
+  }
+
+  .header-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent-cyan);
+    border-radius: 50%;
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .header h1 {
+    font-family: 'Cascadia Code', 'Fira Code', 'SF Mono', 'Menlo', 'Consolas', monospace;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #e2e8f0, #94a3b8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .header-subtitle {
+    font-size: 14px;
+    color: var(--text-secondary);
+    max-width: 500px;
+    line-height: 1.6;
+  }
+
+  .header-stats {
+    display: flex;
+    gap: 24px;
+  }
+
+  .stat-block {
+    text-align: right;
+    padding: 12px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    min-width: 140px;
+  }
+
+  .stat-value {
+    font-family: 'Cascadia Code', 'Fira Code', 'SF Mono', 'Menlo', 'Consolas', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent-cyan);
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 2px;
+  }
+
+  /* SVG Flow Container */
+  .flow-container {
+    position: relative;
+    width: 100%;
+    margin-bottom: 48px;
+  }
+
+  .flow-svg {
+    width: 100%;
+    height: auto;
+  }
+
+  /* Node styling */
+  .node-group {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  .node-group:hover {
+    transform: translateY(-2px);
+  }
+
+  .node-rect {
+    rx: 10;
+    ry: 10;
+    stroke-width: 1.5;
+    transition: all 0.3s ease;
+  }
+
+  .node-group:hover .node-rect {
+    stroke-width: 2;
+    filter: drop-shadow(0 0 12px var(--accent-blue));
+  }
+
+  .node-id {
+    font-family: 'Cascadia Code', 'Fira Code', 'SF Mono', 'Menlo', 'Consolas', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+
+  .node-title {
+    font-family: -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .node-value {
+    font-family: 'Cascadia Code', 'Fira Code', 'SF Mono', 'Menlo', 'Consolas', monospace;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .node-detail {
+    font-family: -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    font-size: 10px;
+  }
+
+  /* Flow connections */
+  .flow-path {
+    fill: none;
+    stroke-width: 2;
+    opacity: 0.6;
+  }
+
+  .flow-path-glow {
+    fill: none;
+    stroke-width: 6;
+    opacity: 0.1;
+  }
+
+  /* Animated flow particles */
+  .flow-particle {
+    r: 3;
+    opacity: 0.9;
+  }
+
+  /* Tooltip */
+  .tooltip {
+    position: fixed;
+    z-index: 100;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    max-width: 340px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), var(--glow-blue);
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    backdrop-filter: blur(12px);
+  }
+
+  .tooltip.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .tooltip-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tooltip-id {
+    font-family: 'Cascadia Code', 'Fira Code', 'SF Mono', 'Menlo', 'Consolas', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--accent-cyan);
+    background: rgba(6, 182, 212, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .tooltip-title {
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .tooltip-body {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  .tooltip-body .value-highlight {
+    color: var(--accent-cyan);
+    font-family: 'Cascadia Code', 'Fira Code', 'SF Mono', 'Menlo', 'Consolas', monospace;
+    font-weight: 500;
+  }
+
+  /* Reliability Section */
+  .reliability-section {
+    margin-top: 16px;
+  }
+
+  .reliability-title {
+    font-family: 'Cascadia Code', 'Fira Code', 'SF Mono', 'Menlo', 'Consolas', monospace;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .reliability-title::before {
+    content: '';
+    width: 3px;
+    height: 20px;
+    background: var(--accent-amber);
+    border-radius: 2px;
+  }
+
+  .reliability-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 12px;
+  }
+
+  .reliability-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .reliability-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+  }
+
+  .reliability-card.s3::before { background: var(--s3-color); }
+  .reliability-card.s4::before { background: var(--s4-color); }
+
+  .reliability-card:hover {
+    background: var(--bg-card-hover);
+    border-color: rgba(59, 130, 246, 0.3);
+    transform: translateX(4px);
+  }
+
+  .rel-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .rel-name {
+    font-weight: 600;
+    font-size: 13px;
+  }
+
+  .rel-impact {
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  .rel-value {
+    font-family: 'Cascadia Code', 'Fira Code', 'SF Mono', 'Menlo', 'Consolas', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  .rel-badge {
+    font-family: 'Cascadia Code', 'Fira Code', 'SF Mono', 'Menlo', 'Consolas', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  .rel-badge.s3 {
+    color: var(--s3-color);
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+  }
+
+  .rel-badge.s4 {
+    color: var(--s4-color);
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+  }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    gap: 24px;
+    margin-top: 32px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .legend-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  /* Cost breakdown bar */
+  .cost-bar-section {
+    margin-top: 48px;
+    padding: 28px 32px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .cost-bar-title {
+    font-family: 'Cascadia Code', 'Fira Code', 'SF Mono', 'Menlo', 'Consolas', monospace;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .cost-bar-title::before {
+    content: '';
+    width: 3px;
+    height: 20px;
+    background: var(--accent-emerald);
+    border-radius: 2px;
+  }
+
+  .cost-bar-subtitle {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+  }
+
+  .cost-bar-wrapper {
+    display: flex;
+    height: 44px;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .cost-segment {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cascadia Code', 'Fira Code', 'SF Mono', 'Menlo', 'Consolas', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+    position: relative;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    overflow: hidden;
+  }
+
+  .cost-segment:hover {
+    filter: brightness(1.2);
+    flex-grow: 0.3 !important;
+  }
+
+  .cost-segment .seg-label {
+    position: absolute;
+    bottom: -22px;
+    font-size: 10px;
+    color: var(--text-dim);
+    white-space: nowrap;
+    font-weight: 400;
+  }
+
+  .cost-legend {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+  }
+
+  .cost-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .cost-legend-swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+  }
+
+  .cost-legend-value {
+    font-family: 'Cascadia Code', 'Fira Code', 'SF Mono', 'Menlo', 'Consolas', monospace;
+    font-size: 12px;
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-in {
+    animation: fadeInUp 0.6s ease forwards;
+    opacity: 0;
+  }
+
+  .animate-in:nth-child(1) { animation-delay: 0.05s; }
+  .animate-in:nth-child(2) { animation-delay: 0.1s; }
+  .animate-in:nth-child(3) { animation-delay: 0.15s; }
+  .animate-in:nth-child(4) { animation-delay: 0.2s; }
+  .animate-in:nth-child(5) { animation-delay: 0.25s; }
+  .animate-in:nth-child(6) { animation-delay: 0.3s; }
+
+  /* Footer */
+  .footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--text-dim);
+    font-family: 'Cascadia Code', 'Fira Code', 'SF Mono', 'Menlo', 'Consolas', monospace;
+  }
+
+  @media (max-width: 900px) {
+    .header { flex-direction: column; align-items: flex-start; }
+    .header-stats { align-self: flex-start; }
+    .reliability-grid { grid-template-columns: 1fr; }
+    .page-wrapper { padding: 24px 16px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+  <!-- Header -->
+  <header class="header animate-in">
+    <div class="header-left">
+      <div class="header-badge">Q^AI Data Flow</div>
+      <h1>Stellantis KP1 燃油供给管路 · 成本数据流</h1>
+      <p class="header-subtitle">从 RFQ 提取到最终报价，完整追踪 18 节点数据链路<br>管径 8×6mm · 工作压力 4.5bar · 22 项性能要求</p>
+    </div>
+    <div class="header-stats">
+      <div class="stat-block">
+        <div class="stat-value">€41.87</div>
+        <div class="stat-label">RC 单件成本</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-value">€167.9万</div>
+        <div class="stat-label">NRC 工程费用</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Flow Diagram (SVG) -->
+  <div class="flow-container animate-in">
+    <svg class="flow-svg" viewBox="0 0 1500 1000" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Gradients for nodes -->
+        <linearGradient id="grad-input" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#1e3a5f"/>
+          <stop offset="100%" stop-color="#152238"/>
+        </linearGradient>
+        <linearGradient id="grad-process" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#1a2e4a"/>
+          <stop offset="100%" stop-color="#141f35"/>
+        </linearGradient>
+        <linearGradient id="grad-cost" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#1a3a3a"/>
+          <stop offset="100%" stop-color="#142828"/>
+        </linearGradient>
+        <linearGradient id="grad-output" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#2a1a3a"/>
+          <stop offset="100%" stop-color="#1e1430"/>
+        </linearGradient>
+        <linearGradient id="grad-final" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#3a2a1a"/>
+          <stop offset="100%" stop-color="#2a1e14"/>
+        </linearGradient>
+
+        <!-- Arrow marker -->
+        <marker id="arrow-blue" viewBox="0 0 10 8" refX="9" refY="4" markerWidth="8" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 4 L 0 8 z" fill="#3b82f6" opacity="0.6"/>
+        </marker>
+        <marker id="arrow-cyan" viewBox="0 0 10 8" refX="9" refY="4" markerWidth="8" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 4 L 0 8 z" fill="#06b6d4" opacity="0.6"/>
+        </marker>
+        <marker id="arrow-emerald" viewBox="0 0 10 8" refX="9" refY="4" markerWidth="8" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 4 L 0 8 z" fill="#10b981" opacity="0.6"/>
+        </marker>
+        <marker id="arrow-amber" viewBox="0 0 10 8" refX="9" refY="4" markerWidth="8" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 4 L 0 8 z" fill="#f59e0b" opacity="0.6"/>
+        </marker>
+        <marker id="arrow-purple" viewBox="0 0 10 8" refX="9" refY="4" markerWidth="8" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 4 L 0 8 z" fill="#8b5cf6" opacity="0.6"/>
+        </marker>
+
+        <!-- Glow filter -->
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+
+      <!-- ========== CONNECTIONS ========== -->
+      <!-- n01 → n03 -->
+      <path class="flow-path" d="M 260 80 L 320 80" stroke="#3b82f6" marker-end="url(#arrow-blue)"/>
+      <!-- n03 → n04 -->
+      <path class="flow-path" d="M 520 80 L 580 80" stroke="#3b82f6" marker-end="url(#arrow-blue)"/>
+      <!-- n04 → n08 -->
+      <path class="flow-path" d="M 780 80 L 900 80" stroke="#3b82f6" marker-end="url(#arrow-blue)"/>
+
+      <!-- n04 → n05 (down-left) -->
+      <path class="flow-path" d="M 650 120 L 650 170 Q 650 190 630 190 L 260 190 Q 240 190 240 210 L 240 220" stroke="#06b6d4" marker-end="url(#arrow-cyan)"/>
+      <!-- n04 → n06 (down to row 2) -->
+      <path class="flow-path" d="M 720 120 L 720 170 Q 720 190 700 190 L 640 190 Q 620 190 620 210 L 620 220" stroke="#06b6d4" marker-end="url(#arrow-cyan)"/>
+
+      <!-- n05 → n11: from n05 bottom-right (340, 320) to n11 top-left (340, 400) -->
+      <path class="flow-path" d="M 260 320 L 260 360 Q 260 380 280 380 L 320 380 Q 340 380 340 400" stroke="#10b981" marker-end="url(#arrow-emerald)"/>
+      <!-- n06 → n11: from n06 bottom-left (500, 320) to n11 top-right (420, 400) -->
+      <path class="flow-path" d="M 580 320 L 580 360 Q 580 380 560 380 L 440 380 Q 420 380 420 400" stroke="#10b981" marker-end="url(#arrow-emerald)"/>
+
+      <!-- n08 → n12: from n08 bottom (1020, 120) down right side, then left to n12 top (680, 400) -->
+      <path class="flow-path" d="M 1020 120 L 1020 350 Q 1020 370 1000 370 L 700 370 Q 680 370 680 390 L 680 400" stroke="#10b981" marker-end="url(#arrow-emerald)"/>
+
+      <!-- n08 → n15: from n08 bottom-right (1100, 120) down to n15 top (1150, 400) -->
+      <path class="flow-path" d="M 1100 120 L 1100 360 Q 1100 380 1120 380 L 1140 380 Q 1150 380 1150 400" stroke="#8b5cf6" marker-end="url(#arrow-purple)"/>
+
+      <!-- n11 → n16: from n11 bottom (380, 480) to n16 top (380, 580) -->
+      <path class="flow-path" d="M 380 480 L 380 580" stroke="#f59e0b" marker-end="url(#arrow-amber)"/>
+
+      <!-- n12 → n16: from n12 bottom-left (640, 480) to n16 top-right (420, 580) -->
+      <path class="flow-path" d="M 640 480 L 640 530 Q 640 550 620 550 L 440 550 Q 420 550 420 570 L 420 580" stroke="#f59e0b" marker-end="url(#arrow-amber)"/>
+
+      <!-- n16 → n18: from n16 bottom (380, 690) to n18 top-left (640, 720) -->
+      <path class="flow-path" d="M 380 690 L 380 710 Q 380 720 400 720 L 580 720 Q 600 720 600 720" stroke="#f59e0b" marker-end="url(#arrow-amber)"/>
+
+      <!-- n15 → n17: from n15 bottom (1150, 500) to n17 top (980, 580) -->
+      <path class="flow-path" d="M 1150 500 L 1150 540 Q 1150 560 1130 560 L 1000 560 Q 980 560 980 580" stroke="#8b5cf6" marker-end="url(#arrow-purple)"/>
+
+      <!-- n17 → n18: from n17 bottom (980, 660) down to n18 top-right (760, 720) -->
+      <path class="flow-path" d="M 940 660 L 940 690 Q 940 710 920 710 L 780 710 Q 760 710 760 720" stroke="#8b5cf6" marker-end="url(#arrow-purple)"/>
+
+      <!-- ========== ANIMATED PARTICLES ========== -->
+      <!-- n01 → n03 -->
+      <circle class="flow-particle" fill="#3b82f6" filter="url(#glow)">
+        <animateMotion dur="2s" repeatCount="indefinite" path="M 260 80 L 320 80"/>
+      </circle>
+      <!-- n03 → n04 -->
+      <circle class="flow-particle" fill="#3b82f6" filter="url(#glow)">
+        <animateMotion dur="2s" repeatCount="indefinite" path="M 520 80 L 580 80" begin="0.3s"/>
+      </circle>
+      <!-- n04 → n08 -->
+      <circle class="flow-particle" fill="#3b82f6" filter="url(#glow)">
+        <animateMotion dur="2s" repeatCount="indefinite" path="M 780 80 L 900 80" begin="0.6s"/>
+      </circle>
+      <!-- n04 → n05 -->
+      <circle class="flow-particle" fill="#06b6d4" filter="url(#glow)">
+        <animateMotion dur="3s" repeatCount="indefinite" path="M 650 120 L 650 170 Q 650 190 630 190 L 260 190 Q 240 190 240 210 L 240 220" begin="1s"/>
+      </circle>
+      <!-- n04 → n06 -->
+      <circle class="flow-particle" fill="#06b6d4" filter="url(#glow)">
+        <animateMotion dur="3s" repeatCount="indefinite" path="M 720 120 L 720 170 Q 720 190 700 190 L 640 190 Q 620 190 620 210 L 620 220" begin="1s"/>
+      </circle>
+      <!-- n05 → n11 -->
+      <circle class="flow-particle" fill="#10b981" filter="url(#glow)">
+        <animateMotion dur="3s" repeatCount="indefinite" path="M 260 320 L 260 360 Q 260 380 280 380 L 320 380 Q 340 380 340 400" begin="2s"/>
+      </circle>
+      <!-- n06 → n11 -->
+      <circle class="flow-particle" fill="#10b981" filter="url(#glow)">
+        <animateMotion dur="3s" repeatCount="indefinite" path="M 580 320 L 580 360 Q 580 380 560 380 L 440 380 Q 420 380 420 400" begin="2s"/>
+      </circle>
+      <!-- n08 → n12 -->
+      <circle class="flow-particle" fill="#10b981" filter="url(#glow)">
+        <animateMotion dur="4s" repeatCount="indefinite" path="M 1020 120 L 1020 350 Q 1020 370 1000 370 L 700 370 Q 680 370 680 390 L 680 400" begin="1.5s"/>
+      </circle>
+      <!-- n08 → n15 -->
+      <circle class="flow-particle" fill="#8b5cf6" filter="url(#glow)">
+        <animateMotion dur="3s" repeatCount="indefinite" path="M 1100 120 L 1100 360 Q 1100 380 1120 380 L 1140 380 Q 1150 380 1150 400" begin="1.5s"/>
+      </circle>
+      <!-- n11 → n16 -->
+      <circle class="flow-particle" fill="#f59e0b" filter="url(#glow)">
+        <animateMotion dur="2s" repeatCount="indefinite" path="M 380 480 L 380 580" begin="3s"/>
+      </circle>
+      <!-- n12 → n16 -->
+      <circle class="flow-particle" fill="#f59e0b" filter="url(#glow)">
+        <animateMotion dur="3s" repeatCount="indefinite" path="M 640 480 L 640 530 Q 640 550 620 550 L 440 550 Q 420 550 420 570 L 420 580" begin="3s"/>
+      </circle>
+      <!-- n16 → n18 -->
+      <circle class="flow-particle" fill="#f59e0b" filter="url(#glow)">
+        <animateMotion dur="3s" repeatCount="indefinite" path="M 380 690 L 380 710 Q 380 720 400 720 L 580 720 Q 600 720 600 720" begin="4s"/>
+      </circle>
+      <!-- n15 → n17 -->
+      <circle class="flow-particle" fill="#8b5cf6" filter="url(#glow)">
+        <animateMotion dur="3s" repeatCount="indefinite" path="M 1150 500 L 1150 540 Q 1150 560 1130 560 L 1000 560 Q 980 560 980 580" begin="3s"/>
+      </circle>
+      <!-- n17 → n18 -->
+      <circle class="flow-particle" fill="#8b5cf6" filter="url(#glow)">
+        <animateMotion dur="3s" repeatCount="indefinite" path="M 940 660 L 940 690 Q 940 710 920 710 L 780 710 Q 760 710 760 720" begin="4s"/>
+      </circle>
+
+      <!-- ========== NODES ========== -->
+
+      <!-- n01: RFQ 提取 (ROW 1, x=60, y=40) -->
+      <g class="node-group" data-node="n01">
+        <rect class="node-rect" x="60" y="40" width="200" height="80" fill="url(#grad-input)" stroke="#3b82f6"/>
+        <text class="node-id" x="80" y="61" fill="#3b82f6">N01</text>
+        <text class="node-title" x="80" y="79" fill="#e2e8f0">RFQ 提取</text>
+        <text class="node-detail" x="80" y="97" fill="#94a3b8">6 份文件 → 22 项需求</text>
+        <text class="node-value" x="80" y="111" fill="#06b6d4">管径 8×6mm · 4.5bar</text>
+      </g>
+
+      <!-- n03: 组件树 (ROW 1, x=320, y=40) -->
+      <g class="node-group" data-node="n03">
+        <rect class="node-rect" x="320" y="40" width="200" height="80" fill="url(#grad-process)" stroke="#3b82f6"/>
+        <text class="node-id" x="340" y="61" fill="#3b82f6">N03</text>
+        <text class="node-title" x="340" y="79" fill="#e2e8f0">组件树分解</text>
+        <text class="node-detail" x="340" y="97" fill="#94a3b8">9 个组件</text>
+        <text class="node-value" x="340" y="111" fill="#06b6d4">2管路+2接头+5辅件</text>
+      </g>
+
+      <!-- n04: BOM (ROW 1, x=580, y=40) -->
+      <g class="node-group" data-node="n04">
+        <rect class="node-rect" x="580" y="40" width="200" height="80" fill="url(#grad-process)" stroke="#3b82f6"/>
+        <text class="node-id" x="600" y="61" fill="#3b82f6">N04</text>
+        <text class="node-title" x="600" y="79" fill="#e2e8f0">BOM 清单</text>
+        <text class="node-detail" x="600" y="97" fill="#94a3b8">make / buy 决策</text>
+        <text class="node-value" x="600" y="111" fill="#06b6d4">3 make · 6 buy</text>
+      </g>
+
+      <!-- n08: 工艺路线 (ROW 1, x=900, y=40) -->
+      <g class="node-group" data-node="n08">
+        <rect class="node-rect" x="900" y="40" width="240" height="80" fill="url(#grad-process)" stroke="#8b5cf6"/>
+        <text class="node-id" x="920" y="61" fill="#8b5cf6">N08</text>
+        <text class="node-title" x="920" y="79" fill="#e2e8f0">工艺路线</text>
+        <text class="node-detail" x="920" y="97" fill="#94a3b8">10 道工序 · 投资 €105万</text>
+        <text class="node-value" x="920" y="111" fill="#8b5cf6" style="font-size:10px">挤出→切割→弯管→压接→装配→检测</text>
+      </g>
+
+      <!-- n05: 材料选型 (ROW 2, x=100, y=220) -->
+      <g class="node-group" data-node="n05">
+        <rect class="node-rect" x="100" y="220" width="240" height="100" fill="url(#grad-cost)" stroke="#10b981"/>
+        <text class="node-id" x="120" y="242" fill="#10b981">N05</text>
+        <text class="node-title" x="120" y="262" fill="#e2e8f0">材料选型</text>
+        <text class="node-detail" x="120" y="282" fill="#94a3b8">PA12 多层管 → €9/kg</text>
+        <text class="node-detail" x="120" y="298" fill="#94a3b8">铝合金接头 → €4.5/kg</text>
+        <text class="node-value" x="120" y="314" fill="#10b981">材料单价确定</text>
+      </g>
+
+      <!-- n06: 用量计算 (ROW 2, x=500, y=220) -->
+      <g class="node-group" data-node="n06">
+        <rect class="node-rect" x="500" y="220" width="240" height="100" fill="url(#grad-cost)" stroke="#10b981"/>
+        <text class="node-id" x="520" y="242" fill="#10b981">N06</text>
+        <text class="node-title" x="520" y="262" fill="#e2e8f0">用量计算</text>
+        <text class="node-detail" x="520" y="282" fill="#94a3b8">管路净重 13.5g + 17.3g</text>
+        <text class="node-detail" x="520" y="298" fill="#94a3b8">含损耗毛重 293g</text>
+        <text class="node-value" x="520" y="314" fill="#10b981">材料消耗量</text>
+      </g>
+
+      <!-- n11: 材料成本 (ROW 3, x=300, y=400) -->
+      <g class="node-group" data-node="n11">
+        <rect class="node-rect" x="300" y="400" width="160" height="80" fill="url(#grad-cost)" stroke="#10b981"/>
+        <text class="node-id" x="320" y="422" fill="#10b981">N11</text>
+        <text class="node-title" x="320" y="440" fill="#e2e8f0">材料成本</text>
+        <text class="node-value" x="320" y="460" fill="#10b981" style="font-size: 14px; font-weight: 700;">€26.96 /件</text>
+        <text class="node-detail" x="320" y="474" fill="#94a3b8">make €0.31 + buy €26.65</text>
+      </g>
+
+      <!-- n12: 转化成本 (ROW 3, x=600, y=400) -->
+      <g class="node-group" data-node="n12">
+        <rect class="node-rect" x="600" y="400" width="160" height="80" fill="url(#grad-cost)" stroke="#10b981"/>
+        <text class="node-id" x="620" y="422" fill="#10b981">N12</text>
+        <text class="node-title" x="620" y="440" fill="#e2e8f0">转化成本</text>
+        <text class="node-value" x="620" y="460" fill="#10b981" style="font-size: 14px; font-weight: 700;">€8.18 /件</text>
+        <text class="node-detail" x="620" y="474" fill="#94a3b8">人工+设备+管理费</text>
+      </g>
+
+      <!-- n15: EDD 工程费 (ROW 3, x=1050, y=400) -->
+      <g class="node-group" data-node="n15">
+        <rect class="node-rect" x="1050" y="400" width="200" height="100" fill="url(#grad-output)" stroke="#8b5cf6"/>
+        <text class="node-id" x="1070" y="422" fill="#8b5cf6">N15</text>
+        <text class="node-title" x="1070" y="442" fill="#e2e8f0">EDD 工程开发费</text>
+        <text class="node-value" x="1070" y="464" fill="#8b5cf6" style="font-size: 14px; font-weight: 700;">€167.9万</text>
+        <text class="node-detail" x="1070" y="480" fill="#94a3b8">模具€105万+测试€30万+其他</text>
+        <text class="node-detail" x="1070" y="494" fill="#94a3b8">5年25万件分摊</text>
+      </g>
+
+      <!-- n16: RC 单件成本 (ROW 4, x=300, y=580) -->
+      <g class="node-group" data-node="n16">
+        <rect class="node-rect" x="300" y="580" width="160" height="110" fill="url(#grad-final)" stroke="#f59e0b"/>
+        <rect x="300" y="580" width="160" height="110" rx="10" ry="10" fill="none" stroke="#f59e0b" stroke-width="2" opacity="0.3">
+          <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3s" repeatCount="indefinite"/>
+        </rect>
+        <text class="node-id" x="320" y="602" fill="#f59e0b">N16</text>
+        <text class="node-title" x="320" y="620" fill="#e2e8f0">RC 成本</text>
+        <text class="node-value" x="320" y="645" fill="#f59e0b" style="font-size: 18px; font-weight: 700;">€41.87</text>
+        <text class="node-detail" x="320" y="665" fill="#94a3b8">材料64%</text>
+        <text class="node-detail" x="320" y="678" fill="#94a3b8">加工20%</text>
+      </g>
+
+      <!-- n17: NRC (ROW 4, x=900, y=580) -->
+      <g class="node-group" data-node="n17">
+        <rect class="node-rect" x="900" y="580" width="160" height="80" fill="url(#grad-output)" stroke="#8b5cf6"/>
+        <text class="node-id" x="920" y="602" fill="#8b5cf6">N17</text>
+        <text class="node-title" x="920" y="620" fill="#e2e8f0">NRC 分摊</text>
+        <text class="node-value" x="920" y="640" fill="#8b5cf6" style="font-size: 14px; font-weight: 700;">€6.72 /件</text>
+        <text class="node-detail" x="920" y="654" fill="#94a3b8">一次性 €167.9万</text>
+      </g>
+
+      <!-- n18: 最终报价 (ROW 5, x=600, y=720) -->
+      <g class="node-group" data-node="n18">
+        <rect class="node-rect" x="600" y="720" width="160" height="100" fill="url(#grad-final)" stroke="#f59e0b" stroke-width="2"/>
+        <rect x="600" y="720" width="160" height="100" rx="10" ry="10" fill="none" stroke="#f59e0b" stroke-width="2.5" opacity="0.4">
+          <animate attributeName="opacity" values="0.2;0.5;0.2" dur="2.5s" repeatCount="indefinite"/>
+        </rect>
+        <text class="node-id" x="620" y="742" fill="#f59e0b">N18</text>
+        <text class="node-title" x="620" y="762" fill="#e2e8f0" style="font-size:14px">最终报价</text>
+        <text class="node-value" x="620" y="788" fill="#f59e0b" style="font-size: 20px; font-weight: 700;">€41.87</text>
+        <text class="node-detail" x="620" y="808" fill="#94a3b8">+ NRC €167.9万</text>
+        <text class="node-detail" x="620" y="822" fill="#94a3b8" style="font-size:9px">年收入 €209万</text>
+      </g>
+
+      <!-- Phase labels -->
+      <text x="60" y="28" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#3b82f6" letter-spacing="2" opacity="0.6">PHASE 1 · 需求分解</text>
+      <text x="100" y="210" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#10b981" letter-spacing="2" opacity="0.6">PHASE 2 · 材料与工艺</text>
+      <text x="300" y="392" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#f59e0b" letter-spacing="2" opacity="0.6">PHASE 3 · 成本汇总</text>
+      <text x="1050" y="392" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#8b5cf6" letter-spacing="2" opacity="0.6">PHASE 4 · NRC & 报价</text>
+
+      <!-- Decorative circuit lines -->
+      <line x1="40" y1="160" x2="1460" y2="160" stroke="#1e2d4a" stroke-width="1" stroke-dasharray="4,8" opacity="0.4"/>
+      <line x1="40" y1="380" x2="1300" y2="380" stroke="#1e2d4a" stroke-width="1" stroke-dasharray="4,8" opacity="0.4"/>
+      <line x1="40" y1="560" x2="1300" y2="560" stroke="#1e2d4a" stroke-width="1" stroke-dasharray="4,8" opacity="0.4"/>
+      <line x1="40" y1="710" x2="900" y2="710" stroke="#1e2d4a" stroke-width="1" stroke-dasharray="4,8" opacity="0.4"/>
+    </svg>
+  </div>
+
+  <!-- Cost Breakdown Bar -->
+  <div class="cost-bar-section animate-in">
+    <div class="cost-bar-title">单件成本结构 · €41.87</div>
+    <div class="cost-bar-subtitle">RC (Recurring Cost) 分项构成</div>
+    <div class="cost-bar-wrapper">
+      <div class="cost-segment" style="flex: 64; background: linear-gradient(135deg, #0d9488, #0f766e);" title="材料 €26.96">
+        <span>材料 64%</span>
+      </div>
+      <div class="cost-segment" style="flex: 20; background: linear-gradient(135deg, #3b82f6, #2563eb);" title="加工 €8.18">
+        <span>加工 20%</span>
+      </div>
+      <div class="cost-segment" style="flex: 4; background: linear-gradient(135deg, #8b5cf6, #7c3aed);" title="物流 €1.76">
+        <span>4%</span>
+      </div>
+      <div class="cost-segment" style="flex: 3; background: linear-gradient(135deg, #ec4899, #db2777);" title="质量 €1.05">
+        <span>3%</span>
+      </div>
+      <div class="cost-segment" style="flex: 2; background: linear-gradient(135deg, #f59e0b, #d97706);" title="管理 €0.82">
+        <span></span>
+      </div>
+      <div class="cost-segment" style="flex: 7; background: linear-gradient(135deg, #ef4444, #dc2626);" title="利润 €3.10">
+        <span>利润 7%</span>
+      </div>
+    </div>
+    <div class="cost-legend">
+      <div class="cost-legend-item">
+        <div class="cost-legend-swatch" style="background: #0d9488;"></div>
+        <span>材料</span>
+        <span class="cost-legend-value">€26.96</span>
+      </div>
+      <div class="cost-legend-item">
+        <div class="cost-legend-swatch" style="background: #3b82f6;"></div>
+        <span>加工</span>
+        <span class="cost-legend-value">€8.18</span>
+      </div>
+      <div class="cost-legend-item">
+        <div class="cost-legend-swatch" style="background: #8b5cf6;"></div>
+        <span>物流</span>
+        <span class="cost-legend-value">€1.76</span>
+      </div>
+      <div class="cost-legend-item">
+        <div class="cost-legend-swatch" style="background: #ec4899;"></div>
+        <span>质量</span>
+        <span class="cost-legend-value">€1.05</span>
+      </div>
+      <div class="cost-legend-item">
+        <div class="cost-legend-swatch" style="background: #f59e0b;"></div>
+        <span>管理</span>
+        <span class="cost-legend-value">€0.82</span>
+      </div>
+      <div class="cost-legend-item">
+        <div class="cost-legend-swatch" style="background: #ef4444;"></div>
+        <span>利润</span>
+        <span class="cost-legend-value">€3.10</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reliability Section -->
+  <div class="reliability-section animate-in">
+    <div class="reliability-title">数据可靠性风险矩阵</div>
+    <div class="reliability-grid">
+      <div class="reliability-card s4">
+        <div class="rel-info">
+          <div class="rel-name">阻尼器单价</div>
+          <div class="rel-impact">占总材料成本 56%，偏差直接影响单价</div>
+        </div>
+        <div class="rel-value">€15</div>
+        <div class="rel-badge s4">S4 推测</div>
+      </div>
+      <div class="reliability-card s4">
+        <div class="rel-info">
+          <div class="rel-name">QC 接头单价</div>
+          <div class="rel-impact">占总材料成本 27%</div>
+        </div>
+        <div class="rel-value">€3-4/个</div>
+        <div class="rel-badge s4">S4 推测</div>
+      </div>
+      <div class="reliability-card s4">
+        <div class="rel-info">
+          <div class="rel-name">管路长度</div>
+          <div class="rel-impact">影响材料用量和弯管工序</div>
+        </div>
+        <div class="rel-value">600mm × 2</div>
+        <div class="rel-badge s4">S4 假设</div>
+      </div>
+      <div class="reliability-card s4">
+        <div class="rel-info">
+          <div class="rel-name">年产量</div>
+          <div class="rel-impact">影响设备分摊和产能利用率</div>
+        </div>
+        <div class="rel-value">50,000</div>
+        <div class="rel-badge s4">S4 假设</div>
+      </div>
+      <div class="reliability-card s3">
+        <div class="rel-info">
+          <div class="rel-name">人工工时费率</div>
+          <div class="rel-impact">影响加工成本</div>
+        </div>
+        <div class="rel-value">€30/hr</div>
+        <div class="rel-badge s3">S3 经验</div>
+      </div>
+      <div class="reliability-card s4">
+        <div class="rel-info">
+          <div class="rel-name">管理费率</div>
+          <div class="rel-impact">影响加工成本</div>
+        </div>
+        <div class="rel-value">175%</div>
+        <div class="rel-badge s4">S4 基准</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend animate-in">
+    <div class="legend-item">
+      <div class="legend-swatch" style="background: #3b82f6;"></div>
+      <span>需求分解链</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background: #06b6d4;"></div>
+      <span>BOM 分发</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background: #10b981;"></div>
+      <span>成本汇聚</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background: #f59e0b;"></div>
+      <span>RC 报价</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background: #8b5cf6;"></div>
+      <span>NRC 链路</span>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer animate-in">
+    <span>Q^AI · Stellantis KP1 燃油供给管路成本数据流</span>
+    <span>Generated 2026-03-18</span>
+  </div>
+
+</div>
+
+<!-- Tooltip -->
+<div class="tooltip" id="tooltip">
+  <div class="tooltip-header">
+    <span class="tooltip-id" id="tooltip-id"></span>
+    <span class="tooltip-title" id="tooltip-title"></span>
+  </div>
+  <div class="tooltip-body" id="tooltip-body"></div>
+</div>
+
+<script>
+const nodeData = {
+  n01: {
+    id: 'N01', title: 'RFQ 提取',
+    body: '从客户 <span class="value-highlight">6 份 RFQ 文件</span>中提取关键需求：<br>• 管径 <span class="value-highlight">8×6mm</span><br>• 工作压力 <span class="value-highlight">4.5bar</span><br>• <span class="value-highlight">22 项</span>性能要求<br><br>输出：结构化需求清单'
+  },
+  n03: {
+    id: 'N03', title: '组件树分解',
+    body: '将总成分解为 <span class="value-highlight">9 个组件</span>：<br>• 2× 管路（PA12多层）<br>• 2× QC 快插接头<br>• 1× 阻尼器<br>• 1× 保护套管<br>• 1× 端帽<br>• 1× 固定夹<br>• 1× O-ring 密封圈'
+  },
+  n04: {
+    id: 'N04', title: 'BOM 清单',
+    body: 'Make/Buy 决策：<br>• <span class="value-highlight">3 make</span>：管路挤出、弯管、组装<br>• <span class="value-highlight">6 buy</span>：接头、阻尼器、套管、帽、夹、密封圈<br><br>分发至 N05 材料选型、N06 用量计算、N08 工艺路线'
+  },
+  n05: {
+    id: 'N05', title: '材料选型',
+    body: '关键材料单价：<br>• PA12 多层管材 → <span class="value-highlight">€9/kg</span><br>• 铝合金6061 接头 → <span class="value-highlight">€4.5/kg</span><br>• NBR 橡胶密封 → <span class="value-highlight">€12/kg</span><br><br>与 N06 用量数据汇入 N11 计算总材料成本'
+  },
+  n06: {
+    id: 'N06', title: '用量计算',
+    body: '各组件重量明细：<br>• 管路 A 净重 <span class="value-highlight">13.5g</span><br>• 管路 B 净重 <span class="value-highlight">17.3g</span><br>• 含损耗毛重 <span class="value-highlight">293g</span><br>• 损耗率包含挤出废料、切割余量'
+  },
+  n08: {
+    id: 'N08', title: '工艺路线',
+    body: '<span class="value-highlight">10 道工序</span>：<br>挤出 → 定尺切割 → 弯管成型 → 端头处理 → 压接 → 套管安装 → 总装 → 气密检测 → 外观检查 → 包装<br><br>设备总投资 <span class="value-highlight">€105万</span>'
+  },
+  n11: {
+    id: 'N11', title: '材料成本',
+    body: 'N05 + N06 汇总：<br>• Make 材料：<span class="value-highlight">€0.31/件</span>（管路材料很便宜）<br>• Buy 采购：<span class="value-highlight">€26.65/件</span><br>&nbsp;&nbsp;- 阻尼器 €15（占56%）<br>&nbsp;&nbsp;- 接头 2×€3.65（占27%）<br>• 合计 <span class="value-highlight">€26.96/件</span>'
+  },
+  n12: {
+    id: 'N12', title: '转化成本',
+    body: '基于 N08 工艺路线计算：<br>• 人工费率 <span class="value-highlight">€30/hr</span><br>• 设备折旧分摊<br>• 管理费率 <span class="value-highlight">175%</span><br><br>合计 <span class="value-highlight">€8.18/件</span>'
+  },
+  n15: {
+    id: 'N15', title: 'EDD 工程开发费',
+    body: '一次性投入明细：<br>• 模具费 <span class="value-highlight">€105万</span><br>• 测试验证费 <span class="value-highlight">€30万</span><br>• 其他开发费 <span class="value-highlight">€32.9万</span><br><br>合计 <span class="value-highlight">€167.9万</span><br>按5年25万件分摊 → €6.72/件'
+  },
+  n16: {
+    id: 'N16', title: 'RC 单件成本',
+    body: '成本结构：<br>• 材料 <span class="value-highlight">€26.96</span> (64%)<br>• 加工 <span class="value-highlight">€8.18</span> (20%)<br>• 物流 <span class="value-highlight">€1.76</span> (4%)<br>• 质量 <span class="value-highlight">€1.05</span> (3%)<br>• 管理 <span class="value-highlight">€0.82</span> (2%)<br>• 利润 <span class="value-highlight">€3.10</span> (7%)<br>────────<br>合计 <span class="value-highlight">€41.87/件</span>'
+  },
+  n17: {
+    id: 'N17', title: 'NRC 分摊',
+    body: '一次性费用 <span class="value-highlight">€167.9万</span><br>按 5年 × 50,000件/年 = 250,000件<br><br>分摊 <span class="value-highlight">€6.72/件</span><br><br>注：年产量 50,000 为 S4 假设值'
+  },
+  n18: {
+    id: 'N18', title: '最终报价',
+    body: '报价组成：<br>• 单价 <span class="value-highlight">€41.87/件</span> (RC)<br>• 一次性 <span class="value-highlight">€167.9万</span> (NRC)<br><br>年收入测算：<br>50,000 × €41.87 = <span class="value-highlight">€209万/年</span>'
+  }
+};
+
+const tooltip = document.getElementById('tooltip');
+const tooltipId = document.getElementById('tooltip-id');
+const tooltipTitle = document.getElementById('tooltip-title');
+const tooltipBody = document.getElementById('tooltip-body');
+
+document.querySelectorAll('.node-group').forEach(node => {
+  node.addEventListener('mouseenter', (e) => {
+    const key = node.dataset.node;
+    const data = nodeData[key];
+    if (!data) return;
+    tooltipId.textContent = data.id;
+    tooltipTitle.textContent = data.title;
+    tooltipBody.innerHTML = data.body;
+    tooltip.classList.add('visible');
+  });
+
+  node.addEventListener('mousemove', (e) => {
+    const x = e.clientX + 16;
+    const y = e.clientY - 8;
+    const rect = tooltip.getBoundingClientRect();
+    const maxX = window.innerWidth - rect.width - 20;
+    const maxY = window.innerHeight - rect.height - 20;
+    tooltip.style.left = Math.min(x, maxX) + 'px';
+    tooltip.style.top = Math.min(y, maxY) + 'px';
+  });
+
+  node.addEventListener('mouseleave', () => {
+    tooltip.classList.remove('visible');
+  });
+});
+
+// Stagger animations on load
+document.querySelectorAll('.animate-in').forEach((el, i) => {
+  el.style.animationDelay = `${i * 0.12}s`;
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<style>
+@page {
+    size: A4;
+    margin: 3cm 2.5cm 2.5cm 2.5cm;
+    @bottom-right {
+        content: counter(page);
+        font-size: 8pt;
+        color: #999;
+        font-family: "Noto Sans CJK SC", sans-serif;
+    }
+    @top-left {
+        content: "";
+        border-bottom: 0.5pt solid #ddd;
+    }
+}
+
+body {
+    font-family: "Noto Sans CJK SC", "Noto Sans", "Helvetica Neue", sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.8;
+    color: #333;
+    letter-spacing: 0.02em;
+}
+
+h1 {
+    font-size: 18pt;
+    font-weight: 300;
+    color: #1a1a2e;
+    border-bottom: none;
+    margin-top: 50px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    page-break-before: always;
+    letter-spacing: 0.08em;
+    border-left: 3px solid #0066cc;
+    padding-left: 16px;
+}
+
+h1:first-of-type {
+    page-break-before: avoid;
+    margin-top: 0;
+}
+
+h2 {
+    font-size: 13pt;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-top: 28px;
+    margin-bottom: 14px;
+    border-left: none;
+    padding-left: 0;
+    letter-spacing: 0.04em;
+}
+
+h3 {
+    font-size: 11pt;
+    font-weight: 600;
+    color: #444;
+    margin-top: 20px;
+    margin-bottom: 8px;
+}
+
+p {
+    margin-bottom: 10px;
+    text-align: justify;
+}
+
+ul, ol {
+    margin-bottom: 12px;
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 6px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 9.5pt;
+}
+
+thead th, th {
+    background-color: #1a1a2e;
+    color: #fff;
+    font-weight: 600;
+    padding: 10px 12px;
+    border: none;
+    text-align: left;
+    letter-spacing: 0.03em;
+    font-size: 9pt;
+}
+
+td {
+    padding: 9px 12px;
+    border-bottom: 1px solid #e8e8e8;
+    vertical-align: top;
+    color: #444;
+}
+
+th:first-child, td:first-child {
+    white-space: nowrap;
+    min-width: 5em;
+}
+
+tr:nth-child(even) td {
+    background-color: #fafafa;
+}
+
+pre {
+    background-color: #f5f5f5;
+    border: none;
+    border-left: 3px solid #ddd;
+    padding: 14px 18px;
+    font-family: "Noto Sans Mono CJK SC", "SF Mono", "Consolas", monospace;
+    font-size: 8.5pt;
+    line-height: 1.6;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    margin: 16px 0;
+    color: #555;
+}
+
+code {
+    font-family: "Noto Sans Mono CJK SC", "SF Mono", "Consolas", monospace;
+    font-size: 9pt;
+    background-color: #f0f0f0;
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: #c7254e;
+}
+
+pre code {
+    background: none;
+    padding: 0;
+    color: #555;
+}
+
+strong {
+    color: #1a1a2e;
+    font-weight: 600;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #eee;
+    margin: 30px 0;
+}
+
+.toc {
+    page-break-after: always;
+}
+
+.toc h1 {
+    page-break-before: avoid;
+    text-align: left;
+    border-bottom: none;
+    border-left: 3px solid #0066cc;
+    padding-left: 16px;
+    font-size: 18pt;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    color: #1a1a2e;
+    margin-bottom: 30px;
+}
+
+.toc ul {
+    list-style: none;
+    padding-left: 0;
+    font-size: 11pt;
+    line-height: 2.4;
+}
+
+.toc li {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 2px 0;
+    color: #333;
+}
+
+.toc li.h2-item {
+    padding-left: 24px;
+    font-size: 10pt;
+    color: #666;
+}
+
+.cover {
+    text-align: left;
+    padding-top: 280px;
+    padding-left: 20px;
+    page-break-after: always;
+}
+
+.cover h1 {
+    font-size: 32pt;
+    font-weight: 300;
+    border-bottom: none;
+    border-left: 4px solid #0066cc;
+    color: #1a1a2e;
+    page-break-before: avoid;
+    margin-bottom: 20px;
+    text-align: left;
+    padding-left: 20px;
+    letter-spacing: 0.06em;
+    line-height: 1.3;
+}
+
+.cover .subtitle {
+    font-size: 14pt;
+    font-weight: 300;
+    color: #888;
+    margin-bottom: 100px;
+    text-align: left;
+    padding-left: 24px;
+    letter-spacing: 0.04em;
+}
+
+.cover .tagline {
+    font-size: 11pt;
+    font-weight: 400;
+    color: #666;
+    text-align: left;
+    padding-left: 24px;
+    letter-spacing: 0.04em;
+    margin-bottom: 80px;
+}
+
+.cover .date {
+    font-size: 10pt;
+    font-weight: 400;
+    color: #aaa;
+    text-align: left;
+    padding-left: 24px;
+    letter-spacing: 0.06em;
+}
+
+.cover .confidential {
+    font-size: 8pt;
+    color: #bbb;
+    text-align: left;
+    padding-left: 24px;
+    margin-top: 40px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+}
+</style>
+</head>
+<body>
+<div class="cover"><h1>Q^AI</h1><p class="subtitle">Quality to the Power of AI</p><p class="tagline">AI 驱动的企业质量保障系统</p><p class="date">2026 年 3 月</p><p class="confidential">Confidential</p></div><div class="toc"><h1>目 录</h1><ul><li class="">Q^AI 技术概览</li><li class="h2-item">系统定位</li><li class="h2-item">技术架构</li><li class="h2-item">核心功能</li><li class="h2-item">数据流</li><li class="h2-item">数据可信度体系</li><li class="h2-item">多 OEM 适配</li><li class="h2-item">人机协作边界</li></ul></div><h1>Q^AI 技术概览</h1><h2>系统定位</h2><p>Q^AI 是一个 AI 驱动的企业质量保障系统，覆盖从客户需求到量产交付的完整 APQP 流程。系统将产品诞生过程中的信息流结构化，沿多个信息节点自动推导，确保跨环节数据一致、来源可追溯、变更可同步。</p><p>系统不替代工程师的判断——它负责信息提取、结构化、推导和一致性维护，工程师负责确认和决策。</p><h2>技术架构</h2><p>系统基于大语言模型（LLM）构建，结合汽车行业 APQP 领域知识深度定制，形成完整的智能工程系统。与通用 AI 工具有本质区别——这不是一个聊天助手，而是一套有严格工程纪律的自动化流水线。</p><p><strong>核心技术栈：</strong></p><table><thead><tr><th>技术层</th><th>作用</th><th>说明</th></tr></thead><tbody><tr><td><strong>Workflow 引擎</strong></td><td>流程编排</td><td>18 个信息节点按有向无环图（DAG）自动调度，依赖关系自动管理，支持并行执行</td></tr><tr><td><strong>Skill 系统</strong></td><td>领域知识封装</td><td>每个节点的行业知识（如 DFMEA 评分规则、工艺模板、成本公式）以独立技能包形式封装，可扩展、可迭代</td></tr><tr><td><strong>Agent 协作</strong></td><td>智能执行</td><td>多个 AI Agent 并行处理不同文件和任务，自动分工、汇总结果，大幅提升处理速度</td></tr><tr><td><strong>自动编排调度</strong></td><td>级联更新</td><td>任意节点数据变更时，系统自动计算影响范围，按拓扑顺序逐级更新下游节点，确保数据一致性</td></tr><tr><td><strong>置信度传播</strong></td><td>数据质量追踪</td><td>每个数据点标注来源和可信度（S1-S5），低置信度自动向下游传播，报价依据透明可审计</td></tr><tr><td><strong>人机协作控制</strong></td><td>决策边界</td><td>AI 能确定的自动处理，不确定的强制暂停等待人工确认——系统不替人做判断，不悄悄猜测</td></tr></tbody></table><p><strong>与通用 AI 工具的区别：</strong></p><ul><li>通用 AI 是"你问我答"——本系统是"按 APQP 标准自动推导，人只确认关键决策"</li><li>通用 AI 输出不可追溯——本系统每个数字都能追溯到客户文件的具体章节</li><li>通用 AI 无法保证一致性——本系统一处变更全程同步，不会有文件间的矛盾</li><li>系统能力随使用持续积累，项目越多、数据越丰富，推导越精准</li></ul><h2>核心功能</h2><h3>1. 客户文件智能解析</h3><p><strong>输入</strong>：客户发来的 RFQ 文件包（PDF、Excel、Word、PPT，通常 5-20 个文件）</p><p><strong>系统做什么</strong>：</p><ul><li>自动识别文件角色（采购规范、性能标准、技术规范、交付物清单、模板文件）</li><li>递归提取嵌入文件（OEM 文件常有多层嵌套，如 Excel 里嵌 Word，Word 里嵌 PPT）</li><li>从每个文件中提取结构化数据：性能要求、测试项、特殊特性、引用标准、几何参数</li><li>识别客户提供的模板文件，自动关联到对应交付物</li></ul><p><strong>输出</strong>：结构化需求数据 + 数据缺口清单 + 文件索引</p><h3>2. 设计要求结构化</h3><p><strong>输入</strong>：提取的客户需求数据</p><p><strong>系统做什么</strong>：</p><ul><li>将每条客户需求翻译为供应商侧的设计目标</li><li>按 8 个工程类别分类：功能性能、结构完整性、环境耐受、尺寸符合性、材料合规、电气/EMC、质量可靠性、外观标识</li><li>量化每条指标，无法量化的标注"待工程师确认"</li><li>检测不同文件间的数据冲突</li></ul><p><strong>输出</strong>：分类量化的工程指标表（DRG）</p><h3>3. 产品结构与 BOM</h3><p><strong>输入</strong>：客户图纸/3D 模型 + 技术规范</p><p><strong>系统做什么</strong>：</p><ul><li>生成组件树（零件清单、数量、材料提示）</li><li>判断每个组件的 make/buy 决策：有明确依据的自动判定，不确定的标注出来让工程师确认</li><li>有 3D 模型时精确提取几何参数，无模型时从图片和规范推导并标注假设</li></ul><p><strong>输出</strong>：多层级 BOM + 组件几何参数</p><h3>4. 风险分析（DFMEA）</h3><p><strong>输入</strong>：组件树 + 装配接口 + 工程指标</p><p><strong>系统做什么</strong>：</p><ul><li>按组件类型自动识别潜在失效模式（如管路→爆裂/泄漏/疲劳，接头→脱出/密封失效）</li><li>按 AIAG 标准评分：严重度 × 发生频率 × 检测能力 = 风险优先级</li><li>高风险项自动关联检测方法和推荐措施</li><li>特殊特性（CC/SC）强制覆盖检查</li></ul><p><strong>输出</strong>：DFMEA 表 + 高风险项清单</p><h3>5. 工艺路线与产能</h3><p><strong>输入</strong>：BOM（make 零件）+ DFMEA（高风险项需要的过程控制）</p><p><strong>系统做什么</strong>：</p><ul><li>按产品类型匹配工艺模板（管路→挤出+弯管+装配，注塑件→模具+注射+检查）</li><li>估算每道工序的设备投资、节拍时间、操作人数</li><li>DFMEA 高风险项自动在工艺路线中关联检测工序</li><li>计算产线总投资、瓶颈工序、年产能</li></ul><p><strong>输出</strong>：工艺路线表 + 产能分析</p><h3>6. 成本推算</h3><p><strong>输入</strong>：材料选型 + 用量 + 工艺路线</p><p><strong>系统做什么</strong>：</p><ul><li>材料费：每个零件的重量 × 材料单价</li><li>加工费：每道工序的人工 + 设备折旧 + 管理费</li><li>一次性费用：模具投资 + 测试费 + 工程开发费</li><li>汇总为单件成本（RC）和一次性费用（NRC）</li><li>每个数字标注来源和可信度</li></ul><p><strong>输出</strong>：成本明细 + 单件报价 + NRC 报价</p><h3>7. 交付物自动生成</h3><p><strong>输入</strong>：各环节产出的数据 + 客户模板文件</p><p><strong>系统做什么</strong>：</p><ul><li>识别当前阶段需要提交的交付物清单</li><li>优先使用客户提供的模板格式，自动填入数据</li><li>无客户模板时使用公司标准格式或从零生成</li></ul><p><strong>输出</strong>：按客户格式填写好的交付文件（Excel/Word）</p><h3>8. 变更级联更新</h3><p><strong>输入</strong>：任何环节的数据更新（如客户补了 3D 模型、确认了年产量）</p><p><strong>系统做什么</strong>：</p><ul><li>自动计算受影响的下游环节</li><li>只更新受影响的部分，不全量重跑</li><li>更新后的交付文件自动重新生成</li></ul><p><strong>输出</strong>：更新后的全套数据和文件，变更记录可追溯</p><h2>数据流</h2><h3>总体数据流</h3><p>系统分四层处理，数据从上往下逐层推导：</p><table><thead><tr><th>层级</th><th>处理内容</th><th>输入</th><th>输出</th></tr></thead><tbody><tr><td><strong>文件解析层</strong></td><td>PDF/Excel/PPT 递归提取嵌入文件，结构化</td><td>客户 RFQ 文件包</td><td>性能要求、测试项、特殊特性、引用标准、交付物清单</td></tr><tr><td><strong>工程分析层</strong></td><td>设计要求(DRG) + 产品结构(BOM) + 风险分析(DFMEA) → 材料选型 + 用量计算 + 工艺路线</td><td>文件解析层产出</td><td>量化的工程指标、组件清单、失效模式、工艺方案</td></tr><tr><td><strong>成本推算层</strong></td><td>材料费 + 加工费 + 管理费 → 单件成本(RC)；模具 + 测试 + 工程开发 → 一次性费用(NRC)</td><td>工程分析层产出</td><td>单件报价 + NRC 报价</td></tr><tr><td><strong>报价输出层</strong></td><td>汇总所有数据，按客户模板生成交付文件</td><td>成本推算层产出</td><td>可提交的报价包（所有数据标注来源和可信度）</td></tr></tbody></table><h3>单个信息节点的处理流程</h3><p>每个节点按统一流程执行，确保数据质量和可追溯性：</p><table><thead><tr><th>步骤</th><th>做什么</th><th>说明</th></tr></thead><tbody><tr><td>1. 前置条件检查</td><td>检查上游数据是否就绪</td><td>有阻塞性缺口则暂停</td></tr><tr><td>2. 执行核心逻辑</td><td>AI 推理 + 确定性计算</td><td>不确定的标注待确认，不猜测</td></tr><tr><td>3. 写入结构化数据</td><td>输出 JSON 格式数据</td><td>每个数据点标注来源和可信度</td></tr><tr><td>4. 生成交付文件</td><td>如果本节点负责某个交付物</td><td>用客户模板填入数据，输出 Excel</td></tr><tr><td>5. 记录与报告</td><td>技术审计日志 + 工作总结</td><td>确保可追溯</td></tr><tr><td>6. 传递下游</td><td>下游节点自动消费本节点产出</td><td>DAG 驱动，无需手动传递</td></tr></tbody></table><h3>变更级联数据流</h3><p>当任何环节的数据发生变更时（例如客户补充了 3D 模型），系统自动处理：</p><table><thead><tr><th>步骤</th><th>动作</th><th>示例</th></tr></thead><tbody><tr><td>1. 更新源节点</td><td>用新数据替换旧数据，提升可信度</td><td>几何参数从假设值(S4) → 实测值(S1)</td></tr><tr><td>2. 计算影响范围</td><td>自动分析哪些下游节点受影响</td><td>BOM、用量、DFMEA、工艺、成本</td></tr><tr><td>3. 智能判断更新方式</td><td>每个受影响节点：局部更新 or 全量重算</td><td>材料不变(跳过)、用量重算、评分更新</td></tr><tr><td>4. 重新生成交付物</td><td>所有受影响的交付文件自动重新生成</td><td>更新后的 Excel 自动覆盖旧版本</td></tr></tbody></table><h2>数据可信度体系</h2><p>系统中每一个数据点都标注来源和可信度等级：</p><table><thead><tr><th>等级</th><th>来源</th><th>含义</th><th>示例</th></tr></thead><tbody><tr><td>S1</td><td>客户文件/法规</td><td>硬性要求，不允许假设</td><td>爆破压力 ≥ 36 bar（来自 PF 规范）</td></tr><tr><td>S2</td><td>物理/几何计算</td><td>数学推导</td><td>管路净重 = π×(OD²-ID²)/4×L×ρ</td></tr><tr><td>S3</td><td>公司历史数据</td><td>来自内部数据库或经验</td><td>人工工时费率 30 元/小时</td></tr><tr><td>S4</td><td>行业基准</td><td>必须标注为假设</td><td>年产量 50,000（客户未说明）</td></tr><tr><td>S5</td><td>AI 推断</td><td>必须标注"待验证"</td><td>管路总长度 ~600mm（从图片推测）</td></tr></tbody></table><p><strong>可信度向下传播</strong>：如果某个零件的长度是 S4（假设），那么基于它算出的重量、材料费、单件成本都继承 S4。报价文件中所有 S4/S5 项集中列出，提醒客户这些数据待确认。</p><h2>多 OEM 适配</h2><p>系统的业务逻辑与 OEM 特定格式解耦。核心引擎处理通用逻辑（组件类型→失效模式、工艺路线、材料推荐），OEM 适配层处理文件格式差异：</p><table><thead><tr><th>层级</th><th>内容</th><th>变更频率</th></tr></thead><tbody><tr><td><strong>核心引擎（通用）</strong></td><td>组件类型→失效模式映射、工艺模板、材料推荐、成本计算</td><td>稳定，极少变更</td></tr><tr><td><strong>OEM 适配层</strong></td><td>文件解析规则、术语映射、交付物模板格式</td><td>每接入新 OEM 配置一次</td></tr></tbody></table><table><thead><tr><th>OEM</th><th>文件特点</th><th>适配内容</th></tr></thead><tbody><tr><td>Stellantis</td><td>SSTS + CTS + TDR + PF 规范，OLE 嵌入层层嵌套</td><td>已完成</td></tr><tr><td>VW/Audi</td><td>Lastenheft + VW-Norm，德语文档，结构规范</td><td>待配置</td></tr><tr><td>BMW</td><td>QMT + BMW-Norm，PDF 为主</td><td>待配置</td></tr><tr><td>通用 GM</td><td>SSTS 类似但格式不同</td><td>待配置</td></tr></tbody></table><p>接入新 OEM 时，核心引擎不变，只需配置该 OEM 的文件解析规则和模板格式。</p><h2>人机协作边界</h2><table><thead><tr><th>系统自动做</th><th>系统做不了（需要人）</th></tr></thead><tbody><tr><td>文件解析和数据提取</td><td>判断 RFQ 是否值得报价</td></tr><tr><td>结构化和分类</td><td>确认 make/buy 决策（不确定的项）</td></tr><tr><td>失效模式识别和评分</td><td>补充公司特有的工艺经验</td></tr><tr><td>成本计算和汇总</td><td>确认利润率和报价策略</td></tr><tr><td>交付物生成</td><td>最终报价审批</td></tr><tr><td>变更影响追踪</td><td>与客户沟通确认缺口数据</td></tr><tr><td>数据一致性维护</td><td>商务谈判</td></tr></tbody></table><p><strong>设计原则：系统能确定的自动处理，不确定的一定停下来让人确认。不会悄悄猜测。</strong></p>
+</body>
+</html>

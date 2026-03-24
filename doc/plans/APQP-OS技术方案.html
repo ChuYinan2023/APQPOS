@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<style>
+@page {
+    size: A4;
+    margin: 2.5cm 2cm 2.5cm 2cm;
+    @bottom-center {
+        content: counter(page) " / " counter(pages);
+        font-size: 9pt;
+        color: #888;
+        font-family: "Noto Sans CJK SC", sans-serif;
+    }
+}
+
+body {
+    font-family: "Noto Sans CJK SC", "Noto Sans", Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.7;
+    color: #222;
+}
+
+h1 {
+    font-size: 20pt;
+    font-weight: bold;
+    color: #1a365d;
+    border-bottom: 2px solid #2c5282;
+    padding-bottom: 8px;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    page-break-before: always;
+}
+
+h1:first-of-type {
+    page-break-before: avoid;
+    margin-top: 0;
+}
+
+h2 {
+    font-size: 15pt;
+    font-weight: bold;
+    color: #2c5282;
+    margin-top: 30px;
+    margin-bottom: 12px;
+    border-left: 4px solid #3182ce;
+    padding-left: 12px;
+}
+
+h3 {
+    font-size: 12pt;
+    font-weight: bold;
+    color: #2d3748;
+    margin-top: 20px;
+    margin-bottom: 8px;
+}
+
+p {
+    margin-bottom: 8px;
+    text-align: justify;
+}
+
+ul, ol {
+    margin-bottom: 10px;
+    padding-left: 24px;
+}
+
+li {
+    margin-bottom: 4px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 10pt;
+}
+
+thead th, th {
+    background-color: #e2e8f0;
+    color: #1a365d;
+    font-weight: bold;
+    padding: 8px 10px;
+    border: 1px solid #cbd5e0;
+    text-align: left;
+}
+
+td {
+    padding: 6px 10px;
+    border: 1px solid #e2e8f0;
+    vertical-align: top;
+}
+
+tr:nth-child(even) td {
+    background-color: #f7fafc;
+}
+
+pre {
+    background-color: #f0f4f8;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    padding: 12px 16px;
+    font-family: "Noto Sans Mono CJK SC", "Courier New", monospace;
+    font-size: 9pt;
+    line-height: 1.5;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    margin: 12px 0;
+}
+
+code {
+    font-family: "Noto Sans Mono CJK SC", "Courier New", monospace;
+    font-size: 9.5pt;
+    background-color: #edf2f7;
+    padding: 1px 4px;
+    border-radius: 2px;
+}
+
+pre code {
+    background: none;
+    padding: 0;
+}
+
+strong {
+    color: #1a202c;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #e2e8f0;
+    margin: 24px 0;
+}
+
+.toc {
+    page-break-after: always;
+}
+
+.toc h1 {
+    page-break-before: avoid;
+    text-align: center;
+    border-bottom: none;
+}
+
+.toc ul {
+    list-style: none;
+    padding-left: 0;
+    font-size: 12pt;
+    line-height: 2.2;
+}
+
+.toc li {
+    border-bottom: 1px dotted #cbd5e0;
+    padding: 2px 0;
+}
+
+.toc li.h2-item {
+    padding-left: 20px;
+    font-size: 11pt;
+}
+
+.cover {
+    text-align: center;
+    padding-top: 250px;
+    page-break-after: always;
+}
+
+.cover h1 {
+    font-size: 30pt;
+    border-bottom: none;
+    border-left: none;
+    color: #1a365d;
+    page-break-before: avoid;
+    margin-bottom: 40px;
+    text-align: center;
+    padding-left: 0;
+}
+
+.cover .subtitle {
+    font-size: 15pt;
+    color: #4a5568;
+    margin-bottom: 80px;
+    text-align: center;
+}
+
+.cover .date {
+    font-size: 12pt;
+    color: #718096;
+    text-align: center;
+}
+</style>
+</head>
+<body>
+<div class="cover"><h1>APQP-OS 技术方案</h1><p class="subtitle">企业行为质量保障系统 — 报价阶段自动化</p><p class="date">2026 年 3 月</p></div><div class="toc"><h1>目 录</h1><ul><li class="">项目背景与目标</li><li class="h2-item">系统能力概述</li><li class="h2-item">业务价值</li><li class="h2-item">落地路径</li><li class="h2-item">第一阶段：报价阶段自动化</li><li class="h2-item">第二阶段：全流程覆盖</li><li class="h2-item">协作方式</li><li class="h2-item">运维与支持</li><li class="h2-item">数据安全与保密</li><li class="h2-item">客户方配合</li><li class="h2-item">客户方其他投入</li></ul></div><h1>项目背景与目标</h1><p>我们正在构建一个企业行为质量保障系统：把从客户需求到量产交付的完整信息流，变成一个有依据、可追溯、能协作的结构——从根源托底企业行为质量，从而确保企业长期利润目标。</p><p>从 RfQ 拿到手到产品 SOP 批量交付，这中间每一个信息节点的处理痕迹，都在这套系统里。</p><h2>系统能力概述</h2><p>制造业产品诞生过程信息量大、来源分散、跨文件一致性要求极高——这恰好是当下 AI 应用能力涌现的适配场景。但 AI 能力和行业认知缺一不可，两者真正高效协作才能落地，我们已经进行了有效的探索和实践，加上您的协作定能让您领先同行一个时代，这样的组合和机遇不可复制。</p><p>从 RfQ 解析开始，沿完整的信息流走下去：</p><ul><li>客户需求自动结构化，缺口第一时间识别，按 OEM 格式生成交付物</li><li>多角色同一信息空间协作，版本永远对齐——随着使用深入，现有分散工具的必要性会自然降低</li><li>一处变更全程同步，所有相关交付物自动更新，不会有遗漏</li><li>DFMEA 风险驱动 DVP&R 测试项目，来源可追溯，遗漏有标注</li><li>项目工时、样件、测试费用逐项可推导，资源超支从估算阶段就有依据</li><li>需要成本信息时，所有依据已经就位，推导快速精准</li><li>项目知识沉淀在系统里，不随人员流动消失</li></ul><p>第一步的雏形我们已有 Demo 可演示。完整能力在 12 个月内逐步落地。</p><h2>业务价值</h2><ul><li>报价快速精准——定点后不再系统性亏损</li><li>变更有完整记录——ECR/ECN 产生的成本影响有据可查，价格保护有理有据</li><li>AI in loop，每一次信息脉动都有客观依据——从设计、验证到工业化全程数字化+极致精准高效</li><li>信息流完整，PPAP 首次通过率自然提高，量产节点不因返工延误，违约风险降低</li><li>核心知识沉淀在系统里，团队能力不依赖个人经验积累</li></ul><h2>落地路径</h2>第一阶段（3-6 个月）：报价阶段自动化
+  历史项目验证 → 实际项目并行 → 正式上线
+
+第二阶段（3-6 个月）：全流程覆盖
+  设计阶段 → 过程阶段 → 量产确认</pre><p><strong>第一阶段：报价阶段自动化</strong></p><p>拿到客户 RFQ 文件 → 系统自动完成需求解析、成本推算、交付物生成 → 输出可提交的报价包。</p><p>分三步走：</p><ul><li><strong>历史项目验证</strong>：选 3-5 个已完成的不同品类历史 RFQ，用系统跑一遍，产出的报价与实际结果对标</li><li><strong>实际项目并行</strong>：选 2-3 个正在进行的 RFQ，系统和人工同时跑，对比结果和效率</li><li><strong>正式使用</strong>：团队独立使用系统处理新 RFQ</li></ul><p><strong>第二阶段：全流程覆盖</strong></p><p>中标后的完整 APQP 流程——从计划定义到量产确认。报价阶段产出的 BOM、DFMEA、工艺路线等数据直接被后续阶段消费和精化，不重复录入。</p><h2>第一阶段：报价阶段自动化</h2><p>系统在报价阶段覆盖的完整信息链：</p><table><thead><tr><th>环节</th><th>系统做什么</th><th>产出</th></tr></thead><tbody><tr><td>客户文件解析</td><td>自动拆解 RFQ 文件包（PDF/Excel/PPT，含多层嵌入），提取性能要求、测试项、特殊特性、引用标准、交付物清单</td><td>结构化需求数据 + 缺口清单</td></tr><tr><td>设计要求指南</td><td>将客户需求翻译为可量化的工程设计目标，分 8 类，标注待确认项</td><td>DRG 指标表</td></tr><tr><td>产品结构</td><td>生成组件树、装配接口、几何参数（有 3D 模型时精确提取，无模型时标注假设）</td><td>BOM + 组件清单</td></tr><tr><td>材料与用量</td><td>按组件类型推荐材料、计算重量和用量、验证合规性</td><td>材料选型 + 用量表</td></tr><tr><td>风险分析</td><td>按组件和接口识别失效模式，评分排序，高风险项自动关联检测方法</td><td>DFMEA</td></tr><tr><td>工艺与产能</td><td>按产品类型匹配工艺模板，估算设备投资、节拍、人员</td><td>工艺路线 + 产能分析</td></tr><tr><td>测试计划</td><td>从 DFMEA + 客户测试矩阵生成验证计划，确保高风险项全覆盖</td><td>DVP&R</td></tr><tr><td>成本推算</td><td>材料费 + 加工费 + 管理费 → 单件成本；模具 + 测试 + 工程费 → 一次性费用</td><td>RC + NRC</td></tr><tr><td>项目计划</td><td>按 APQP 阶段排里程碑，关联交付物和责任人</td><td>项目时间线</td></tr><tr><td>报价包</td><td>汇总以上所有数据，按客户模板生成交付文件，标注全部假设和待确认项</td><td>可提交的报价包</td></tr></tbody></table><p><strong>关键设计原则：</strong></p><ul><li>系统能确定的自动处理，不确定的一定标注出来让人确认——不会替人做判断</li><li>任何一处数据变更（如客户补了 3D 模型、确认了年产量），相关环节自动更新，不会有遗漏</li><li>所有数据标注来源和可信度（客户文件 > 公司经验 > 行业基准 > 待验证），报价依据透明</li></ul><p><strong>验收标准：</strong></p><ul><li>历史项目对标：成本偏差 ±15% 以内</li><li>效率提升：报价周期缩短 50% 以上</li><li>交付物质量：符合各 OEM 格式要求，报价工程师认可</li></ul><h2>第二阶段：全流程覆盖</h2><p>报价阶段的数据不是用完就丢——中标后，BOM、DFMEA、工艺路线、测试计划直接进入后续阶段，逐步精化到量产级别。</p><table><thead><tr><th>APQP 阶段</th><th>系统做什么</th><th>与报价阶段的关系</th></tr></thead><tbody><tr><td>计划与定义</td><td>客户需求确认、可行性评审记录、项目团队与资源锁定</td><td>读取报价阶段的需求结构和项目计划</td></tr><tr><td>产品设计</td><td>设计评审跟踪、DFMEA 从初版精化到详细版、设计变更影响分析</td><td>报价阶段的失效模式 → 精化到完整版</td></tr><tr><td>过程设计</td><td>PFMEA、控制计划、工装模具跟踪、产线布局</td><td>报价阶段的工艺路线 → 精化到工位级</td></tr><tr><td>产品与过程确认</td><td>DV/PV 试验执行记录、PPAP 文件包生成、MSA/SPC</td><td>报价阶段的 DVP&R → 关联实际试验结果</td></tr><tr><td>量产与持续改进</td><td>量产质量监控、经验教训沉淀、新项目复用</td><td>整个项目知识沉淀为下一个 RFQ 的参考</td></tr></tbody></table><p><strong>核心价值：一条信息流贯穿始终。</strong> 不是五个阶段五套文件，是同一份数据从粗到细、从假设到验证的演进过程。任何环节的变更都能追溯到源头，任何交付物都能推导出依据。</p><h2>协作方式</h2><table><thead><tr><th>阶段</th><th>我方</th><th>贵方</th></tr></thead><tbody><tr><td>历史项目验证</td><td>部署系统、配置 OEM 规则、跑项目、对标分析</td><td>提供 3-5 个历史 RFQ 文件包和实际报价结果</td></tr><tr><td>实际项目并行</td><td>系统运行支持、问题响应、持续优化</td><td>指定 2-3 个在进行的 RFQ 项目，安排报价工程师配合</td></tr><tr><td>正式上线</td><td>培训、交接、运维支持</td><td>团队独立使用</td></tr><tr><td>第二阶段启动</td><td>需求调研、阶段设计、开发交付</td><td>提供全流程业务需求和历史项目数据</td></tr></tbody></table><h2>运维与支持</h2><p>系统上线后的持续运维：</p><ul><li>新 OEM 模板适配（客户拓展新客户时）</li><li>系统功能迭代与优化</li><li>使用问题响应</li><li>数据安全保障与备份</li></ul><h2>数据安全与保密</h2><ul><li>系统本地部署在贵方服务器，项目数据不出贵方网络</li><li>AI 算力调用仅传输必要的文本信息，不传输客户原始图纸文件</li><li>所有项目数据按贵方现有信息安全管理制度管理</li><li>双方签署保密协议，我方对接触的贵方技术资料和商业数据承担保密义务</li></ul><h2>客户方配合</h2><table><thead><tr><th>角色</th><th>人数</th><th>职责</th></tr></thead><tbody><tr><td>项目经理</td><td>1 人</td><td>全程对接，协调内部资源，收集业务需求，组织验收</td></tr></tbody></table><p>项目经理负责统筹与其他工程师（报价、工艺、质量等）的零星对接，无需单独指派。</p><h2>客户方其他投入</h2><p>系统运行所需的服务器和算力资源按实际项目用量弹性配置：</p><table><thead><tr><th>项目</th><th>基础配置</th><th>扩展规则</th><th>首年估算</th></tr></thead><tbody><tr><td>服务器</td><td>1 台</td><td>项目并行量增加时按需扩展</td><td>~5 万元/年</td></tr><tr><td>网络</td><td>现有条件即可</td><td>需保障基本网络通畅</td><td>—</td></tr><tr><td>AI 算力</td><td>按实际调用量</td><td>随项目数量线性增长</td><td>~5 万元/年</td></tr></tbody></table><p><strong>费用模式</strong>：贵方作为首期合作伙伴，承担了前期开发投入和项目验证支持，以上资源费用仅按基础成本收取服务费，不含溢价。</p>
+</body>
+</html>
